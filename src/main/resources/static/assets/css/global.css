@@ -1,0 +1,152 @@
+.font-weight-bold{
+    font-weight: 700 !important;
+}
+.white-placeholder::placeholder {
+    color: #787972;
+    opacity: 1; /* Ensure the color is applied fully */
+    font-weight: 500;
+}
+
+/* For older browsers */
+.white-placeholder:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    font-weight: 500;
+    color: #787972;
+}
+
+.white-placeholder::-ms-input-placeholder { /* Microsoft Edge */
+    font-weight: 500;
+    color: #787972;
+}
+.pointer-cell{
+    cursor: pointer;
+}
+
+
+/*Css For Static Graph */
+/*body {*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*    height: 100vh;*/
+/*    margin: 0;*/
+/*    background-color: #f0f0f0;*/
+/*}*/
+
+/*.card {*/
+/*    width: 50%;*/
+/*    background: white;*/
+/*    border-radius: 8px;*/
+/*    box-shadow: 0 4px 8px rgba(0,0,0,0.1);*/
+/*    padding: 20px;*/
+/*}*/
+
+/*.controls {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    align-items: center;*/
+/*}*/
+
+/*.form-select {*/
+/*    width: 100%;*/
+/*    padding: 10px;*/
+/*    margin-bottom: 10px;*/
+/*    border-radius: 4px;*/
+/*    border: 1px solid #ccc;*/
+/*}*/
+
+/*.btn {*/
+/*    padding: 10px 20px;*/
+/*    border-radius: 4px;*/
+/*    border: none;*/
+/*    color: white;*/
+/*}*/
+
+/*.btn-primary {*/
+/*    background-color: #007bff;*/
+/*}*/
+
+
+.graph-container {
+    width: 100%;
+    padding-top: 50%;
+    position: relative;
+}
+
+.s-curve-graph {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.axis {
+    stroke: #000;
+    stroke-width: 0.5;
+}
+
+.axis-label {
+    font-size: 3px;
+    text-anchor: middle;
+}
+
+.s-curve {
+    fill: none;
+    stroke: #007bff;
+    stroke-width: 2;
+}
+.bell-curve {
+    fill: none;
+    stroke: #28a745;
+    stroke-width: 2;
+}
+
+/*Common Css For OverView*/
+/*Started*/
+.btn-custom {
+    background-color: #007bff; /* Custom button color */
+    color: white;
+    border: none; /* Remove default border */
+    border-radius: 4px; /* Rounded corners */
+    padding: 10px 20px; /* Add padding */
+    font-size: 16px; /* Font size */
+    font-weight: bold; /* Font weight */
+    text-transform: uppercase; /* Uppercase text */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.btn-custom:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5); /* Enhanced shadow on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+    color: #e0e0e0; /* Light text color on hover */
+    border: 1px solid #004494; /* Border on hover for better visibility */
+}
+.nav_custom {
+    background-color: rgba(0, 0, 0, 0.34);
+    box-shadow: 0 .3rem .8rem rgba(0, 0, 0, .12);
+    margin-bottom: 1.5rem;
+    border: 0 solid transparent;
+}
+
+/*ended*/
+
+/*Column Chart Css*/
+/*.table-container {*/
+/*    height: 100vh; !* Full viewport height *!*/
+/*    width: 100vw; !* Full viewport width *!*/
+/*    overflow: hidden; !* Hide any overflow *!*/
+/*}*/
+
+/*.highcharts-figure {*/
+/*    height: 100%;*/
+/*    width: 100%;*/
+/*    margin: 0; !* Remove default margin *!*/
+/*}*/
+
+/*#columnChart {*/
+/*    height: 100%;*/
+/*    width: 100%;*/
+/*}*/
