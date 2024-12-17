@@ -8,6 +8,8 @@ public class JarStatusPortalApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(JarStatusPortalApplication.class, args);
+
+
     }
 
 }

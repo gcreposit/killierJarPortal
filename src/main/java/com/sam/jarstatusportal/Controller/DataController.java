@@ -4,13 +4,17 @@ package com.sam.jarstatusportal.Controller;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import com.sam.jarstatusportal.Entity.JarWebSocketHandler;
+import com.sam.jarstatusportal.Entity.LogWebSocketHandler;
 import com.sam.jarstatusportal.Entity.User;
 import com.sam.jarstatusportal.Service.JarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.*;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +22,12 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/data")
 public class DataController {
+
+    @Autowired
+    private JarWebSocketHandler webSocketHandler;
+
+    @Autowired
+    private LogWebSocketHandler logWebSocketHandler;
 
     private final Map<String, String> processMap = new HashMap<>();
     @Autowired
@@ -28,120 +38,126 @@ public class DataController {
     private static final String VM_PASSWORD = "Pass1197Pass";
 
 
+
     @PostMapping("/executeJar")
-    public String executeJar(@RequestParam String jarPath) {
+    public String executeJar() {
+        final String VM_IP = "62.72.42.59";
+        final String VM_USERNAME = "Administrator";
+        final String VM_PASSWORD = "Pass1197Pass";
+        final String JAR_PATH = "C:\\Users\\Administrator\\Desktop\\JarTesting\\dev3.jar";
+
         try {
             JSch jsch = new JSch();
-            Session session = jsch.getSession(VM_USERNAME, VM_IP.split(":")[0], 22); // Use SSH port 22
+            Session session = jsch.getSession(VM_USERNAME, VM_IP, 22);
             session.setPassword(VM_PASSWORD);
-
-            // Bypass host key verification (not recommended for production)
             session.setConfig("StrictHostKeyChecking", "no");
-
             session.connect();
 
-            // Command to execute the JAR file remotely
-            String command = String.format("java -jar \"%s\"", jarPath);
+            String command = String.format("java -jar \"%s\"", JAR_PATH);
 
-            // Execute command on the remote server
             ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
             channelExec.setCommand(command);
+
+            InputStream inputStream = channelExec.getInputStream();
+            InputStream errorStream = channelExec.getErrStream();
             channelExec.connect();
 
-            // Capture output (optional)
-            InputStream inputStream = channelExec.getInputStream();
-            String output = new String(inputStream.readAllBytes());
+            // Capture STDOUT
+            new Thread(() -> {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        logWebSocketHandler.sendLogToClients("STDOUT: " + line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
 
-            // Close the channel and session
-            channelExec.disconnect();
-            session.disconnect();
+            // Capture STDERR
+            new Thread(() -> {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        logWebSocketHandler.sendLogToClients("STDERR: " + line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
 
-            return "Execution started on VM: " + output;
+            return "JAR execution started. Logs will be streamed.";
         } catch (Exception e) {
             e.printStackTrace();
-            return "Execution failed: " + e.getMessage();
+            return "Failed to start JAR execution. Error: " + e.getMessage();
         }
     }
 
-//    @PostMapping("/executeJar")
-//    public String executeJar(@RequestParam String jarPath) {
-//        try {
-//            // Command to create a scheduled task that runs the JAR with a visible CMD
-//            String createTaskCommand = String.format(
-//                    "schtasks /create /tn MyJarTask /tr \"cmd.exe /c java -jar %s\" /sc once /st 00:00 /f /rl highest",
-//                    jarPath
-//            );
-//
-//            // Use PsExec to create the scheduled task
-//            String createCommand = String.format(
-//                    "psexec \\\\%s -u %s -p %s %s",
-//                    VM_IP, VM_USERNAME, VM_PASSWORD, createTaskCommand
-//            );
-//
-//            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", createCommand);
-//            processBuilder.inheritIO();
-//            Process process = processBuilder.start();
-//            process.waitFor();
-//
-//            // Command to run the task immediately
-//            String runTaskCommand = String.format(
-//                    "psexec \\\\%s -u %s -p %s schtasks /run /tn MyJarTask",
-//                    VM_IP, VM_USERNAME, VM_PASSWORD
-//            );
-//
-//            ProcessBuilder runTaskProcessBuilder = new ProcessBuilder("cmd.exe", "/c", runTaskCommand);
-//            runTaskProcessBuilder.inheritIO();
-//            Process runTaskProcess = runTaskProcessBuilder.start();
-//            runTaskProcess.waitFor();
-//
-//            return "JAR execution started on VM with visible CMD";
-//        } catch (IOException | InterruptedException e) {
-//            e.printStackTrace();
-//            return "Execution failed: " + e.getMessage();
-//        }
-//    }
+// DOwn logic is working
 
 //    @PostMapping("/executeJar")
-//    public String executeJar(@RequestParam String jarPath, @RequestParam String directoryPath) {
+//    public String runJar() {
+//        final String VM_IP = "62.72.42.59";
+//        final String VM_USERNAME = "Administrator";
+//        final String VM_PASSWORD = "Pass1197Pass";
+//        final String JAR_PATH = "C:\\Users\\Administrator\\Desktop\\JarTesting\\dev3.jar";
+//
 //        try {
-//            // Command to create a scheduled task that runs the JAR with a visible CMD in the specified path
-//            String createTaskCommand = String.format(
-//                    "schtasks /create /tn MyJarTask /tr \"cmd.exe /c cd /d %s && java -jar %s\" /sc once /st 00:00 /f /rl highest /v1 /it",
-//                    directoryPath, jarPath
-//            );
+//            JSch jsch = new JSch();
+//            Session session = jsch.getSession(VM_USERNAME, VM_IP, 22);
+//            session.setPassword(VM_PASSWORD);
+//            session.setConfig("StrictHostKeyChecking", "no");
+//            session.connect();
 //
-//            // Use PsExec to create the scheduled task on the VM
-//            String createCommand = String.format(
-//                    "psexec \\\\%s -u %s -p %s %s",
-//                    VM_IP, VM_USERNAME, VM_PASSWORD, createTaskCommand
-//            );
+//            String command = String.format("java -Dlogging.level.root=INFO -jar \"%s\"", JAR_PATH);
 //
-//            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", createCommand);
-//            processBuilder.inheritIO();
-//            Process process = processBuilder.start();
-//            process.waitFor();
+//            ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
+//            channelExec.setCommand(command);
 //
-//            // Command to run the task immediately
-//            String runTaskCommand = String.format(
-//                    "psexec \\\\%s -u %s -p %s schtasks /run /tn MyJarTask",
-//                    VM_IP, VM_USERNAME, VM_PASSWORD
-//            );
+//            InputStream inputStream = channelExec.getInputStream();
+//            InputStream errorStream = channelExec.getErrStream();
+//            channelExec.connect();
 //
-//            ProcessBuilder runTaskProcessBuilder = new ProcessBuilder("cmd.exe", "/c", runTaskCommand);
-//            runTaskProcessBuilder.inheritIO();
-//            Process runTaskProcess = runTaskProcessBuilder.start();
-//            runTaskProcess.waitFor();
+//            // Capture standard output
+//            new Thread(() -> {
+//                try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+//                    String line;
+//                    while ((line = reader.readLine()) != null) {
+//                        System.out.println("STDOUT: " + line);
+//                        webSocketHandler.sendLogToClients(line);
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }).start();
 //
-//            return "JAR execution started on VM with visible CMD in the specified path";
-//        } catch (IOException | InterruptedException e) {
+//            // Capture error output
+//            new Thread(() -> {
+//                try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream))) {
+//                    String line;
+//                    while ((line = errorReader.readLine()) != null) {
+//                        System.out.println("STDERR: " + line);
+//                        webSocketHandler.sendLogToClients("ERROR: " + line);
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }).start();
+//
+//            return "Execution started. Logs will be streamed to the browser.";
+//        } catch (Exception e) {
 //            e.printStackTrace();
-//            return "Execution failed: " + e.getMessage();
+//            return "Failed to execute the JAR file. Error: " + e.getMessage();
 //        }
 //    }
+//
+
+
+
 
 //------------------------------------It's working method for Normal Localhost----------------------------------------------------------
 
-//@PostMapping("/executeJar")
+    //@PostMapping("/executeJar")
 //public String executeJar(@RequestParam String jarPath) {
 //    try {
 //        File jarFile = new File(jarPath);

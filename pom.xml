@@ -72,7 +72,15 @@
             <optional>true</optional>
         </dependency>
 
-<!--        Used SSH -->
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-websocket -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+            <version>6.1.6</version>
+        </dependency>
+
+
+        <!--        Used SSH -->
         <!-- https://mvnrepository.com/artifact/com.github.mwiede/jsch -->
         <dependency>
             <groupId>com.github.mwiede</groupId>

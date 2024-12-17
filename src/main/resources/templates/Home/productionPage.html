@@ -4,13 +4,13 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Production UI</title>
-    <link href="/assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
-    <link href="/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
-    <link href="/assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
-    <link href="/assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="/assets/plugins/simplebar/css/simplebar.css" rel="stylesheet"/>
+    <link href="/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet"/>
+    <link href="/assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet"/>
+    <link href="/assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet"/>
     <!-- loader-->
-    <link href="/assets/css/pace.min.css" rel="stylesheet" />
-    <script src="/assets/js/pace.min.js"></script>
+<!--    <link href="/assets/css/pace.min.css" rel="stylesheet"/>-->
+<!--    <script src="/assets/js/pace.min.js"></script>-->
     <!-- Bootstrap CSS -->
     <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="/assets/css/bootstrap-extended.css" rel="stylesheet">
@@ -51,6 +51,14 @@
         font-size: 14px;
         margin: 4px 2px;
         cursor: pointer;
+    }
+
+    #console {
+        width: 100%;
+        height: 90vh;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid lime;
     }
 
     .status-green {
@@ -148,82 +156,79 @@
 <!--        <div class="table-responsive">-->
 <!--            <table id="example2" class="table table-striped table-bordered">-->
 <div class="container-fluid">
-    <!-- <div>
-      <h1
-        class="mt-4"
-        style="
-          display: flex;
-          justify-content: center;
-          font-weight: 700;
-          font-family: fangsong;
-        "
-      >
-        Production
-      </h1>
-    </div> -->
 
-    <div>
-        <div class="table-responsive mt-5">
-            <table
-                    id="productionTable"
-                    class="table table-striped table-bordered"
-                    style="width: 100%"
-            >
-                <thead class="text-center">
-                <tr>
-                    <th scope="col">Sr.</th>
-                    <th scope="col" hidden>Hidden Id</th>
-                    <th scope="col">JAR</th>
-                    <th scope="col">Website</th>
-                    <th scope="col">Port</th>
-                    <th scope="col">Domain</th>
-                    <th scope="col">SSL Status</th>
-                    <th scope="col">Running Status</th>
-                    <th scope="col">TP Link</th>
-                    <th scope="col">Domain Link</th>
-                    <th scope="col">Action</th>
-                </tr>
-                </thead>
-                <tbody class="text-center">
-                <tr th:each="user, x : ${userList}">
-                    <td th:text="${x.index + 1}"></td>
-                    <td hidden th:text="${user.id}"></td>
-                    <td th:text="${user.jarFilePath}"></td>
-                    <td th:text="${user.website}"></td>
-                    <td th:text="${user.port}"></td>
-                    <td th:text="${user.domain}"></td>
-                    <td>SSL Status</td>
-                    <td>
-                        <button class="status-button" id="status-${user.id}"
-                                th:onclick="checkStatus([[${user.port}]],this)">
-                            Check Status
-                        </button>
-                    </td>
-                    <td>TP Status</td>
-                    <td th:text="${user.domainLink}"></td>
-                    <td class="d-flex justify-content-around">
-                        <div class="d-flex order-actions justify-content-center align-items-center">
-                            <a class="ms-3" th:onclick="performAction([[${user.jarFilePath}]],[[${user.id}]])">
-                                <i class="fas fa-play"></i>
-                            </a>
-                            <a class="ms-3 btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleDarkModal"
-                               th:onclick="fetchIdWiseData([[${user.id}]])">
-                                <i class="fas fa-upload"></i>
-                            </a>
-                            <a class="ms-3" th:onclick="killingJar([[${user.jarFilePath}]],[[${user.id}]])">
-                                <i class="fas fa-stop"></i>
-                            </a>
-                            <!--                            <a class="ms-3">-->
-                            <!--                                <i class="fa-brands fa-neos"></i>-->
-                            <!--                            </a>-->
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
 
-        </div>
+    <div class="table-responsive mt-5">
+        <table
+                id="productionTable"
+                class="table table-striped table-bordered"
+                style="width: 100%"
+        >
+            <thead class="text-center">
+            <tr>
+                <th scope="col">Sr.</th>
+                <th scope="col" hidden>Hidden Id</th>
+                <th scope="col">JAR</th>
+                <th scope="col">Website</th>
+                <th scope="col">Port</th>
+                <th scope="col">Domain</th>
+                <th scope="col">SSL Status</th>
+                <th scope="col">Running Status</th>
+                <th scope="col">TP Link</th>
+                <th scope="col">Domain Link</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody class="text-center">
+            <tr th:each="user, x : ${userList}">
+                <td th:text="${x.index + 1}"></td>
+                <td hidden th:text="${user.id}"></td>
+                <td th:text="${user.jarFilePath}"></td>
+                <td th:text="${user.website}"></td>
+                <td th:text="${user.port}"></td>
+                <td th:text="${user.domain}"></td>
+                <td>SSL Status</td>
+                <td>
+                    <button class="status-button" id="status-${user.id}"
+                            th:onclick="checkStatus([[${user.port}]],this)">
+                        Check Status
+                    </button>
+                </td>
+                <td>TP Status</td>
+                <td th:text="${user.domainLink}"></td>
+                <td class="d-flex justify-content-around">
+                    <div class="d-flex order-actions justify-content-center align-items-center">
+                        <a class="ms-3" th:onclick="performAction([[${user.jarFilePath}]],[[${user.id}]])">
+                            <i class="fas fa-play"></i>
+                        </a>
+                        <a class="ms-3 btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleDarkModal"
+                           th:onclick="fetchIdWiseData([[${user.id}]])">
+                            <i class="fas fa-upload"></i>
+                        </a>
+                        <a class="ms-3" th:onclick="killingJar([[${user.jarFilePath}]],[[${user.id}]])">
+                            <i class="fas fa-stop"></i>
+                        </a>
+                        <!--                            <a class="ms-3">-->
+                        <!--                                <i class="fa-brands fa-neos"></i>-->
+                        <!--                            </a>-->
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
     </div>
+
+    <h1>Real-Time CMD Console</h1>
+<!--    <div id="console"></div>-->
+    <div class="container mt-4">
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs" id="jarTabs" role="tablist"></ul>
+
+        <!-- Tabs Content -->
+        <div class="tab-content" id="jarTabsContent"></div>
+    </div>
+
 </div>
 <div class="col">
     <!-- Button trigger modal -->
@@ -247,7 +252,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Jar File:</label>
-                                    <input type="file" name="jarFile"  class="form-control">
+                                    <input type="file" name="jarFile" class="form-control">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Uplaoding Developer Name:</label>
@@ -255,40 +260,41 @@
                                 </div>
 
 
-
                                 <div class="mb-3">
                                     <label class="form-label">Website Name:</label>
-                                    <input type="text"   id="website" name="website" class="form-control" placeholder="Website Nam">
+                                    <input type="text" id="website" name="website" class="form-control"
+                                           placeholder="Website Nam">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">Domain Name:</label>
-                                    <input type="text" id="domain" name="domain"  class="form-control" placeholder="Domain Name">
+                                    <input type="text" id="domain" name="domain" class="form-control"
+                                           placeholder="Domain Name">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Port:</label>
-                                    <input type="text"  id="port" name="port" class="form-control" placeholder="Port">
+                                    <input type="text" id="port" name="port" class="form-control" placeholder="Port">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Url:</label>
-                                    <input type="url"  id="url" name="url" class="form-control" placeholder="https://example.com/users/">
+                                    <input type="url" id="url" name="url" class="form-control"
+                                           placeholder="https://example.com/users/">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">Date:</label>
-                                    <input type="date" id="date" name="date"  class="form-control">
+                                    <input type="date" id="date" name="date" class="form-control">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Month:</label>
-                                    <input type="month"  id="month" name="month" class="form-control">
+                                    <input type="month" id="month" name="month" class="form-control">
                                 </div>
 
 
                                 <div class="mb-3">
                                     <label class="form-label">Time:</label>
-                                    <input type="time"  id="time" name="time" class="form-control">
+                                    <input type="time" id="time" name="time" class="form-control">
                                 </div>
-
 
 
                             </div>
@@ -390,16 +396,77 @@
 
 <script>
 
+    let tabCounter = 1; // Keep track of dynamically added tabs
     function performAction(path, id) {
 
         console.log("jar path", path)
         console.log("rowData ", id)
+        const tabId = `tab-${tabCounter}`;
+        const paneId = `pane-${tabCounter}`;
+        const consoleId = `console-${paneId}`;
+        tabCounter++;
+
+        // Add a new tab to the tabs navigation
+        const tabHTML = `
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="${tabId}" data-bs-toggle="tab" data-bs-target="#${paneId}" type="button" role="tab" aria-controls="${paneId}" aria-selected="true">
+                CMD ${tabCounter - 1}
+            </button>
+        </li>
+    `;
+        document.getElementById('jarTabs').insertAdjacentHTML('beforeend', tabHTML);
+
+        // Add a new pane for this tab
+        const paneHTML = `
+        <div class="tab-pane fade" id="${paneId}" role="tabpanel" aria-labelledby="${tabId}" tabindex="0">
+            <div id="${consoleId}" class="border p-3" style="height: 300px; overflow-y: auto; background-color: #000; color: #00FF00;">
+                <span style="color: lime">WebSocket Connection Establishing...</span><br>
+            </div>
+        </div>
+    `;
+        document.getElementById('jarTabsContent').insertAdjacentHTML('beforeend', paneHTML);
+
+        // Activate the new tab
+        document.getElementById(tabId).click();
+
+
+        // Correctly reference the dynamically created consoleDiv
+        const consoleDiv = document.getElementById(consoleId);
+
+        // Step 1: Establish the WebSocket connection
+        const socket = new WebSocket('ws://localhost:5050/ws/logs');
+
+        socket.onopen = () => {
+            consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
+            console.log("WebSocket Connected!");
+        };
+
+        socket.onmessage = (event) => {
+            console.log("WebSocket Message:", event.data);
+            const message = event.data;
+            consoleDiv.innerHTML += message + '<br>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll to the bottom
+        };
+
+        socket.onerror = () => {
+            consoleDiv.innerHTML += '<span style="color: red">WebSocket Error!</span><br>';
+            console.error("WebSocket Error!");
+        };
+
+        socket.onclose = () => {
+            consoleDiv.innerHTML += '<span style="color: orange">WebSocket Connection Closed</span><br>';
+            console.log("WebSocket Closed!");
+        };
+
+        <!------------Socket Logic Implemented Ended----------------->
 
         fetch('/data/executeJar?jarPath=' + encodeURIComponent(path), {
             method: 'POST'
         })
             .then(response => response.text())
+
             .then(data => {
+
                 console.log(data); // Log response from the server
 
             })
@@ -481,6 +548,11 @@
             console.error('Error fetching data:', error);
         });
     }
+
+</script>
+
+<!--Script Fpr CMD-->
+<script>
 
 </script>
 </body>
