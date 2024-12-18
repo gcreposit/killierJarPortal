@@ -396,94 +396,181 @@
 
 <script>
 
-    let tabCounter = 1; // Keep track of dynamically added tabs
+
+    let tabCounter = 1; // Counter for dynamically created CMD tabs
+    let activeSessions = []; // Track active sessions to persist across refresh
+
+    // Function to Perform Action on Play Button Click
     function performAction(path, id) {
-        debugger;
-        console.log("jar path", path)
-        console.log("rowData ", id)
+        console.log("JAR Path:", path, "Row Data:", id);
+
+        // Generate IDs
+        const sessionId = `cmd-${id}`;
         const tabId = `tab-${tabCounter}`;
         const paneId = `pane-${tabCounter}`;
         const consoleId = `console-${paneId}`;
+
+        // Avoid duplicate sessions
+        if (!activeSessions.includes(sessionId)) {
+            activeSessions.push(sessionId);
+            sessionStorage.setItem('activeSessions', JSON.stringify(activeSessions));
+        }
+
         tabCounter++;
 
-        // Add a new tab to the tabs navigation
-        const tabHTML = `
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="${tabId}" data-bs-toggle="tab" data-bs-target="#${paneId}" type="button" role="tab" aria-controls="${paneId}" aria-selected="true">
-                CMD ${tabCounter - 1}
-            </button>
-        </li>
-    `;
-        document.getElementById('jarTabs').insertAdjacentHTML('beforeend', tabHTML);
+        // Create CMD Tab and WebSocket
+        createCMDTab(tabId, paneId, consoleId, sessionId);
+        setupWebSocket(path, id, sessionId, consoleId);
+    }
 
-        // Add a new pane for this tab
+    // Function to Create CMD Tabs Dynamically
+    function createCMDTab(tabId, paneId, consoleId, sessionId) {
+        // Add a new tab with a close button
+        const tabHTML = `
+        <li class="nav-item" id="tab-container-${tabId}">
+            <button class="nav-link d-flex justify-content-between align-items-center" id="${tabId}"
+                    data-bs-toggle="tab" data-bs-target="#${paneId}" type="button" role="tab" aria-controls="${paneId}">
+                CMD ${tabCounter - 1}
+                <span onclick="closeTab('${tabId}', '${paneId}', '${sessionId}', '${consoleId}')"
+                      style="margin-left: 10px; cursor: pointer; color: red;">&times;</span>
+            </button>
+        </li>`;
+
+        // Add a new pane for CMD Console
         const paneHTML = `
-        <div class="tab-pane fade" id="${paneId}" role="tabpanel" aria-labelledby="${tabId}" tabindex="0">
+        <div class="tab-pane fade" id="${paneId}" role="tabpanel" aria-labelledby="${tabId}">
             <div id="${consoleId}" class="border p-3" style="height: 300px; overflow-y: auto; background-color: #000; color: #00FF00;">
                 <span style="color: lime">WebSocket Connection Establishing...</span><br>
             </div>
-        </div>
-    `;
+        </div>`;
+
+        // Append to DOM
+        document.getElementById('jarTabs').insertAdjacentHTML('beforeend', tabHTML);
         document.getElementById('jarTabsContent').insertAdjacentHTML('beforeend', paneHTML);
 
         // Activate the new tab
         document.getElementById(tabId).click();
+    }
 
+    // Function to Reload Sessions on Page Refresh
+    window.onload = function reloadSessions() {
+        debugger;
+        const savedSessions = JSON.parse(sessionStorage.getItem('activeSessions')) || [];
+        savedSessions.forEach(sessionId => {
+            const tabId = `tab-${tabCounter}`;
+            const paneId = `pane-${tabCounter}`;
+            const consoleId = `console-${paneId}`;
+            tabCounter++;
 
-        // Correctly reference the dynamically created consoleDiv
+            // Recreate CMD Tab
+            createCMDTab(tabId, paneId, consoleId, sessionId);
+
+            // Fetch persisted logs
+            fetch(`/data/fetchLogs?sessionId=${sessionId}`)
+                .then(response => response.json())
+                .then(logs => {
+                    const consoleDiv = document.getElementById(consoleId);
+                    logs.forEach(log => {
+                        consoleDiv.innerHTML += log + '<br>';
+                    });
+                    consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll
+                })
+                .catch(error => console.error("Error fetching logs:", error));
+
+            // krliya  bc persistent logic complete Reconnect WebSocket mast logic h ye :)❣️
+            justToReconnectWebsocket(sessionId, consoleId);
+        });
+    };
+
+    function justToReconnectWebsocket(sessionId, consoleId) {
         const consoleDiv = document.getElementById(consoleId);
-
-        // Step 1: Establish the WebSocket connection
-        // const socket = new WebSocket('ws://localhost:5050/ws/logs');
-        const sessionId = `cmd-${id}`; // Generate a unique ID for this tab
         const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
 
         socket.onopen = () => {
             consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
-            console.log("WebSocket Connected!");
         };
 
         socket.onmessage = (event) => {
-            console.log("WebSocket Message:", event.data);
-            const message = event.data;
-            consoleDiv.innerHTML += message + '<br>';
+            console.log(event.data)
+            consoleDiv.innerHTML += event.data + '<br>';
             consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll to the bottom
         };
 
         socket.onerror = () => {
             consoleDiv.innerHTML += '<span style="color: red">WebSocket Error!</span><br>';
-            console.error("WebSocket Error!");
         };
 
         socket.onclose = () => {
             consoleDiv.innerHTML += '<span style="color: orange">WebSocket Connection Closed</span><br>';
-            console.log("WebSocket Closed!");
         };
 
-        <!------------Socket Logic Implemented Ended----------------->
+        consoleDiv.socket = socket; // Attach socket for cleanup
 
-        fetch(`/data/executeJar?jarPath=${encodeURIComponent(path)}&sessionId=${sessionId}&id=${id}`, {
-            method: 'POST'
-        })
-            .then(response => response.text())
-
-            .then(data => {
-
-                console.log(data); // Log response from the server
-
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
     }
 
+    // Function to Setup WebSocket
+    function setupWebSocket(path, id, sessionId, consoleId) {
+        console.log("redis SessionId", sessionId)
+        console.log("redis consoleId", consoleId)
+        const consoleDiv = document.getElementById(consoleId);
+        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+
+        socket.onopen = () => {
+            consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
+        };
+
+        socket.onmessage = (event) => {
+            console.log(event.data)
+            consoleDiv.innerHTML += event.data + '<br>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll to the bottom
+        };
+
+        socket.onerror = () => {
+            consoleDiv.innerHTML += '<span style="color: red">WebSocket Error!</span><br>';
+        };
+
+        socket.onclose = () => {
+            consoleDiv.innerHTML += '<span style="color: orange">WebSocket Connection Closed</span><br>';
+        };
+
+        consoleDiv.socket = socket; // Attach socket for cleanup
 
 
+        // If triggered by play button, call the backend to execute JAR
+        if (path && id) {
+            fetch(`/data/executeJar?jarPath=${encodeURIComponent(path)}&sessionId=${sessionId}&id=${id}`, {
+                method: 'POST'
+            })
+                .then(response => response.text())
+                .then(data => console.log("Backend Response:", data))
+                .catch(error => console.error("Error:", error));
+        }
+    }
+
+    // Function to Close Tab and Cleanup
+    function closeTab(tabId, paneId, sessionId, consoleId) {
+        // Remove Tab and Pane
+        document.getElementById(`tab-container-${tabId}`).remove();
+        document.getElementById(paneId).remove();
+
+        // Terminate WebSocket
+        const consoleDiv = document.getElementById(consoleId);
+        if (consoleDiv && consoleDiv.socket) {
+            consoleDiv.socket.close();
+            console.log("WebSocket Closed for Session:", sessionId);
+        }
+
+        // Remove sessionId from activeSessions
+        activeSessions = activeSessions.filter(s => s !== sessionId);
+        sessionStorage.setItem('activeSessions', JSON.stringify(activeSessions));
+    }
+
+    // Function to Kill JAR
     function killingJar(jarPath, id) {
-        fetch(`/data/killJar?id=${id}`, { method: 'POST' })
+        fetch(`/data/killJar?id=${id}`, {method: 'POST'})
             .then(response => response.text())
             .then(data => {
-                console.log(data); // Display server response
+                console.log(data);
                 alert("Process Killed Successfully!");
             })
             .catch(error => {
@@ -492,44 +579,6 @@
             });
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // function killingJar(path, id) {
-    //     console.log("Full jar path:", path);
-    //     console.log("Row data:", id);
-    //
-    //     // Extract the filename from the full path
-    //     const filename = path.split('\\').pop();
-    //     console.log("Extracted filename:", filename);
-    //
-    //     // Construct the URL with the filename as a query parameter
-    //     const url = `/data/killJar?jarPath=${encodeURIComponent(filename)}`;
-    //
-    //     fetch(url, {
-    //         method: 'POST'
-    //     })
-    //         .then(response => response.text())
-    //         .then(data => {
-    //             console.log(data); // Log response from the server
-    //         })
-    //         .catch(error => {
-    //             console.error('Error:', error);
-    //         });
-    // }
 
     function checkStatus(port, buttonElement) {
         fetch(`http://localhost:${port}/actuator/health`)

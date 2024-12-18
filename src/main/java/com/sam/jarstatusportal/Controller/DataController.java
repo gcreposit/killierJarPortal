@@ -9,6 +9,7 @@ import com.sam.jarstatusportal.Entity.LogWebSocketHandler;
 import com.sam.jarstatusportal.Entity.User;
 import com.sam.jarstatusportal.Service.JarService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
@@ -18,6 +19,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +33,8 @@ public class DataController {
     @Autowired
     private LogWebSocketHandler logWebSocketHandler;
 
+    private static final ConcurrentHashMap<String, Process> activeProcesses = new ConcurrentHashMap<>();
+
     private final Map<String, String> processMap = new HashMap<>();
     @Autowired
     private JarService jarService;
@@ -39,6 +43,21 @@ public class DataController {
     private static final String VM_USERNAME = "Administrator";
     private static final String VM_PASSWORD = "Pass1197Pass";
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @GetMapping("/fetchLogs")
+    public List<String> fetchLogs(@RequestParam("sessionId") String sessionId) {
+        // Fetch logs from Redis
+        String redisKey = "logs:" + sessionId;
+        List<String> logs = redisTemplate.opsForList().range(redisKey, 0, -1);
+
+        // Print logs retrieved for debugging
+        System.out.println("Logs retrieved from Redis for sessionId " + sessionId + ":");
+        logs.forEach(System.out::println);
+
+        return logs; // Return logs to the client
+    }
 
     @PostMapping("/executeJar")
     public String executeJar(@RequestParam("jarPath") String jarPath,@RequestParam("sessionId") String sessionId,
