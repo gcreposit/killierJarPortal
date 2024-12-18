@@ -16,4 +16,8 @@ public interface JarService {
     List<User> findAllDataOfUser(Long id);
 
     String updationJarFile(User user);
+
+    void savePidIntoDatabase(String pid,Long id);
+
+    String getPidById(Long id);
 }

@@ -31,7 +31,7 @@ public class jarServiceImpl implements JarService {
 
         MultipartFile jarFile = user.getJarFile();
 
-        Path jarFilePath = Path.of(jarUplaodDirectory +"/"+ jarFile.getOriginalFilename());
+        Path jarFilePath = Path.of(jarUplaodDirectory + "/" + jarFile.getOriginalFilename());
 
         Files.createDirectories(jarFilePath.getParent());
         jarFile.transferTo(jarFilePath);
@@ -49,13 +49,12 @@ public class jarServiceImpl implements JarService {
 
     @Override
     public List<User> findAllDataOfUser(Long id) {
-        List<User> list= jarRepo.findByyId(id);
-        return  list;
+        List<User> list = jarRepo.findByyId(id);
+        return list;
     }
 
     @Override
     public String updationJarFile(User user) {
-
 
 
         Optional<User> optionalNonResidential = jarRepo.findById(user.getId());
@@ -108,7 +107,6 @@ public class jarServiceImpl implements JarService {
 //                        }
 
 
-
                         MultipartFile jarFile = user.getJarFile();
                         if (jarFile != null && !jarFile.isEmpty()) {
                             // Define the path for the file
@@ -142,10 +140,25 @@ public class jarServiceImpl implements JarService {
             // Save and return the updated nonResidential object
             jarRepo.save(existingJarData);
 
-        }
-        else {
+        } else {
             return null; // Or handle the case where the NonResidential object with the given ID was not found
         }
         return null;
+    }
+
+    @Override
+    public void savePidIntoDatabase(String pid, Long id) {
+
+        User user = jarRepo.findById(id).get();
+        user.setPid(pid);
+        jarRepo.save(user);
+
+    }
+
+    @Override
+    public String getPidById(Long id) {
+
+        String pid = jarRepo.findById(id).get().getPid();
+        return pid;
     }
 }

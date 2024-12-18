@@ -22,7 +22,7 @@ public class User {
 
     private String developerName;
     private String website;
-    private  String port;
+    private String port;
     private String domain;
     private String url;
 
@@ -35,9 +35,11 @@ public class User {
 
     private String jarFilePath;
 
+    private String pidId;
 
-    private String    date ;
-    private String    month ;
-    private String    time ;
+
+    private String date;
+    private String month;
+    private String time;
 
 }

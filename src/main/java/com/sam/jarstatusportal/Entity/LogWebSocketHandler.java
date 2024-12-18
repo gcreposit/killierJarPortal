@@ -6,27 +6,31 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class LogWebSocketHandler extends TextWebSocketHandler {
 
-    private static final CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
+    // Map session IDs to WebSocket sessions
+    private static final ConcurrentHashMap<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        sessions.add(session);
-        System.out.println("WebSocket Connection Established: " + session.getId());
+        // Extract sessionId parameter from the WebSocket URL
+        String sessionId = session.getUri().getQuery().split("=")[1];
+        sessionMap.put(sessionId, session);
+        System.out.println("WebSocket Connection Established for sessionId: " + sessionId);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, org.springframework.web.socket.CloseStatus status) {
-        sessions.remove(session);
+        sessionMap.values().remove(session);
         System.out.println("WebSocket Connection Closed: " + session.getId());
     }
 
-    public void sendLogToClients(String logMessage) {
-        for (WebSocketSession session : sessions) {
+    public void sendLogToClient(String sessionId, String logMessage) {
+        WebSocketSession session = sessionMap.get(sessionId);
+        if (session != null && session.isOpen()) {
             try {
                 session.sendMessage(new TextMessage(logMessage));
             } catch (IOException e) {

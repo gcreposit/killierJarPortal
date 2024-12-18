@@ -9,8 +9,8 @@
     <link href="/assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet"/>
     <link href="/assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet"/>
     <!-- loader-->
-<!--    <link href="/assets/css/pace.min.css" rel="stylesheet"/>-->
-<!--    <script src="/assets/js/pace.min.js"></script>-->
+    <!--    <link href="/assets/css/pace.min.css" rel="stylesheet"/>-->
+    <!--    <script src="/assets/js/pace.min.js"></script>-->
     <!-- Bootstrap CSS -->
     <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="/assets/css/bootstrap-extended.css" rel="stylesheet">
@@ -220,7 +220,7 @@
     </div>
 
     <h1>Real-Time CMD Console</h1>
-<!--    <div id="console"></div>-->
+    <!--    <div id="console"></div>-->
     <div class="container mt-4">
         <!-- Tabs Navigation -->
         <ul class="nav nav-tabs" id="jarTabs" role="tablist"></ul>
@@ -398,7 +398,7 @@
 
     let tabCounter = 1; // Keep track of dynamically added tabs
     function performAction(path, id) {
-
+        debugger;
         console.log("jar path", path)
         console.log("rowData ", id)
         const tabId = `tab-${tabCounter}`;
@@ -434,7 +434,9 @@
         const consoleDiv = document.getElementById(consoleId);
 
         // Step 1: Establish the WebSocket connection
-        const socket = new WebSocket('ws://localhost:5050/ws/logs');
+        // const socket = new WebSocket('ws://localhost:5050/ws/logs');
+        const sessionId = `cmd-${id}`; // Generate a unique ID for this tab
+        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
 
         socket.onopen = () => {
             consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
@@ -460,7 +462,7 @@
 
         <!------------Socket Logic Implemented Ended----------------->
 
-        fetch('/data/executeJar?jarPath=' + encodeURIComponent(path), {
+        fetch(`/data/executeJar?jarPath=${encodeURIComponent(path)}&sessionId=${sessionId}&id=${id}`, {
             method: 'POST'
         })
             .then(response => response.text())
@@ -476,28 +478,58 @@
     }
 
 
-    function killingJar(path, id) {
-        console.log("Full jar path:", path);
-        console.log("Row data:", id);
 
-        // Extract the filename from the full path
-        const filename = path.split('\\').pop();
-        console.log("Extracted filename:", filename);
-
-        // Construct the URL with the filename as a query parameter
-        const url = `/data/killJar?jarPath=${encodeURIComponent(filename)}`;
-
-        fetch(url, {
-            method: 'POST'
-        })
+    function killingJar(jarPath, id) {
+        fetch(`/data/killJar?id=${id}`, { method: 'POST' })
             .then(response => response.text())
             .then(data => {
-                console.log(data); // Log response from the server
+                console.log(data); // Display server response
+                alert("Process Killed Successfully!");
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error("Error:", error);
+                alert("Failed to kill the process.");
             });
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // function killingJar(path, id) {
+    //     console.log("Full jar path:", path);
+    //     console.log("Row data:", id);
+    //
+    //     // Extract the filename from the full path
+    //     const filename = path.split('\\').pop();
+    //     console.log("Extracted filename:", filename);
+    //
+    //     // Construct the URL with the filename as a query parameter
+    //     const url = `/data/killJar?jarPath=${encodeURIComponent(filename)}`;
+    //
+    //     fetch(url, {
+    //         method: 'POST'
+    //     })
+    //         .then(response => response.text())
+    //         .then(data => {
+    //             console.log(data); // Log response from the server
+    //         })
+    //         .catch(error => {
+    //             console.error('Error:', error);
+    //         });
+    // }
 
     function checkStatus(port, buttonElement) {
         fetch(`http://localhost:${port}/actuator/health`)
