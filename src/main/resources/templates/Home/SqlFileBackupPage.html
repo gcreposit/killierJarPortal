@@ -370,6 +370,9 @@
         alert(`Downloading ${fileType} backup for project: ${selectedProject}`);
         confirmationModal.hide();
 
+
+
+
         // API call to download the file  using Blob Storage
         fetch(`/data/downloadBackup?projectName=${selectedProject}&fileType=${fileType}`, {
             method: "POST"
