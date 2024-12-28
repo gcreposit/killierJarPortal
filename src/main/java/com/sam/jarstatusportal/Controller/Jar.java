@@ -54,6 +54,18 @@ public class Jar {
         return "redirect:/jar/dashboard";
 
     }
+//Sql/File Backup Page loading function
+    @GetMapping(path = "/uploadDownlaodForm")
+    public String SqlFileBackupPage(Model theModel) {
+
+
+        return "Home/SqlFileBackupPage";
+
+    }
+
+
+
+
 
 
 }

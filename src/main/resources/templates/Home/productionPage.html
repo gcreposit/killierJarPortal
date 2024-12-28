@@ -158,6 +158,14 @@
 <div class="container-fluid">
 
 
+    <div class="container-fluid text-center mt-5">
+        <h1 class="mb-4">SQL/File Backup</h1>
+        <a th:href="@{/jar/uploadDownlaodForm}" class="btn btn-primary btn-lg">
+            SQL/File Backup
+        </a>
+    </div>
+
+
     <div class="table-responsive mt-5">
         <table
                 id="productionTable"
@@ -219,7 +227,7 @@
 
     </div>
 
-    <h1>Real-Time CMD Console</h1>
+    <h1 class="text-center">Real-Time CMD Console</h1>
     <!--    <div id="console"></div>-->
     <div class="container mt-4">
         <!-- Tabs Navigation -->
@@ -228,6 +236,8 @@
         <!-- Tabs Content -->
         <div class="tab-content" id="jarTabsContent"></div>
     </div>
+
+
 
 </div>
 <div class="col">
@@ -310,6 +320,9 @@
         </div>
     </div>
 </div>
+
+
+
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script
@@ -394,13 +407,14 @@
     });
 </script>
 
+<!---------------------Script For CMD Logics  Started------------------------->
 <script>
 
 
     let tabCounter = 1; // Counter for dynamically created CMD tabs
     let activeSessions = []; // Track active sessions to persist across refresh
 
-    // Function to Perform Action on Play Button Click
+    // Function to Perform Action on Play Button Click sab kch yhni se shuur horha h
     function performAction(path, id) {
         console.log("JAR Path:", path, "Row Data:", id);
 
@@ -632,9 +646,8 @@
 
 </script>
 
-<!--Script Fpr CMD-->
-<script>
+<!---------------------Script For CMD Logics  Ended------------------------->
 
-</script>
+
 </body>
 </html>

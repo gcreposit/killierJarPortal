@@ -7,15 +7,19 @@ import com.jcraft.jsch.Session;
 import com.sam.jarstatusportal.Entity.JarWebSocketHandler;
 import com.sam.jarstatusportal.Entity.LogWebSocketHandler;
 import com.sam.jarstatusportal.Entity.User;
+import com.sam.jarstatusportal.Service.GdriveService;
 import com.sam.jarstatusportal.Service.JarService;
+import io.opencensus.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,15 +48,18 @@ public class DataController {
     private static final String VM_PASSWORD = "Pass1197Pass";
 
     @Autowired
+    private GdriveService gdriveService;
+
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     @GetMapping("/fetchLogs")
     public List<String> fetchLogs(@RequestParam("sessionId") String sessionId) {
-        // Fetch logs from Redis
+
         String redisKey = "logs:" + sessionId;
         List<String> logs = redisTemplate.opsForList().range(redisKey, 0, -1);
 
-        // Print logs retrieved for debugging
+        // abeyy dkh ja bhai logs
         System.out.println("Logs retrieved from Redis for sessionId " + sessionId + ":");
         logs.forEach(System.out::println);
 
@@ -60,7 +67,7 @@ public class DataController {
     }
 
     @PostMapping("/executeJar")
-    public String executeJar(@RequestParam("jarPath") String jarPath,@RequestParam("sessionId") String sessionId,
+    public String executeJar(@RequestParam("jarPath") String jarPath, @RequestParam("sessionId") String sessionId,
                              @RequestParam("id") Long id) {
         final String VM_IP = "62.72.42.59";
         final String VM_USERNAME = "Administrator";
@@ -187,123 +194,6 @@ public class DataController {
     }
 
 
-
-
-
-
-// DOwn logic is working
-
-//    @PostMapping("/executeJar")
-//    public String runJar() {
-//        final String VM_IP = "62.72.42.59";
-//        final String VM_USERNAME = "Administrator";
-//        final String VM_PASSWORD = "Pass1197Pass";
-//        final String JAR_PATH = "C:\\Users\\Administrator\\Desktop\\JarTesting\\dev3.jar";
-//
-//        try {
-//            JSch jsch = new JSch();
-//            Session session = jsch.getSession(VM_USERNAME, VM_IP, 22);
-//            session.setPassword(VM_PASSWORD);
-//            session.setConfig("StrictHostKeyChecking", "no");
-//            session.connect();
-//
-//            String command = String.format("java -Dlogging.level.root=INFO -jar \"%s\"", JAR_PATH);
-//
-//            ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
-//            channelExec.setCommand(command);
-//
-//            InputStream inputStream = channelExec.getInputStream();
-//            InputStream errorStream = channelExec.getErrStream();
-//            channelExec.connect();
-//
-//            // Capture standard output
-//            new Thread(() -> {
-//                try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-//                    String line;
-//                    while ((line = reader.readLine()) != null) {
-//                        System.out.println("STDOUT: " + line);
-//                        webSocketHandler.sendLogToClients(line);
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }).start();
-//
-//            // Capture error output
-//            new Thread(() -> {
-//                try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream))) {
-//                    String line;
-//                    while ((line = errorReader.readLine()) != null) {
-//                        System.out.println("STDERR: " + line);
-//                        webSocketHandler.sendLogToClients("ERROR: " + line);
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }).start();
-//
-//            return "Execution started. Logs will be streamed to the browser.";
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return "Failed to execute the JAR file. Error: " + e.getMessage();
-//        }
-//    }
-//
-
-
-//------------------------------------It's working method for Normal Localhost----------------------------------------------------------
-
-    //@PostMapping("/executeJar")
-//public String executeJar(@RequestParam String jarPath) {
-//    try {
-//        File jarFile = new File(jarPath);
-//        String directory = jarFile.getParent();
-//
-//        // Path to the log file in the same directory as the JAR file
-//        String logFilePath = Paths.get(directory, "log.txt").toString();
-//        // Command to open a new CMD window and execute the JAR file
-//        String command = String.format("cmd.exe /c start cmd.exe /k \"java -jar \"%s\"\"", jarPath);
-//
-//        // ProcessBuilder to execute the command
-//        ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "start", "cmd.exe", "/k", command);
-//        processBuilder.inheritIO(); // Inherit I/O for real-time output
-//
-//        // Start the process
-//        Process process = processBuilder.start();
-//        process.waitFor(); // Wait for the process to complete
-//
-//        return "Execution started in a new CMD window";
-//    } catch (IOException | InterruptedException e) {
-//        e.printStackTrace();
-//        return "Execution failed";
-//    }
-//}
-//    @PostMapping("/killJar")
-//    public String killJar(@RequestParam String jarPath) {
-//        try {
-//            // Format the command to search for the JAR by its filename
-//            String command = String.format("for /f \"tokens=1\" %%a in ('jps -l ^| findstr /i \"%s\"') do taskkill /F /PID %%a", jarPath);
-//
-//            // Use ProcessBuilder to open CMD and execute the command
-//            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "start", "cmd.exe", "/k", command);
-//
-//            // Inherit the I/O to see the output in real-time
-//            processBuilder.inheritIO();
-//
-//            // Start the process
-//            Process process = processBuilder.start();
-//
-//            // Wait for the process to complete
-//            process.waitFor();
-//
-//            return "Kill command executed successfully.";
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return "Error occurred: " + e.getMessage();
-//        }
-//    }
-
-
     @GetMapping("/fetchIdWiseDataForJar/{id}")
     public List<User> fetchDataById(@PathVariable(name = "id") Long id) {
 
@@ -314,25 +204,37 @@ public class DataController {
     }
 
 
-//    @PostMapping("/executeJar")
-//    public String executeJar(@RequestParam String jarPath) {
-//        try {
-//            // Path to your batch file
-//            String batchFilePath = "C:\\path\\to\\your\\runJar.bat";
-//
-//            // Command to open a new CMD window and execute the batch file
-//            ProcessBuilder processBuilder = new ProcessBuilder(
-//                    "cmd.exe", "/c", "start", "cmd.exe", "/k", batchFilePath + " \"" + jarPath + "\""
-//            );
-//
-//            // Start the process
-//            Process process = processBuilder.start();
-//            process.waitFor(); // Wait for the process to complete
-//
-//            return "Execution started in a new CMD window";
-//        } catch (IOException | InterruptedException e) {
-//            e.printStackTrace();
-//            return "Execution failed";
-//        }
-//    }
+
+
+    //    This is the end point where I start the backup
+    @PostMapping("/startBackup")
+    public ResponseEntity<String> startBackup(@RequestParam String projectName) {
+        String response = gdriveService.startBackup(projectName);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/downloadBackup")
+    public ResponseEntity<InputStreamResource>  downloadBackup(@RequestParam String projectName,
+                                                               @RequestParam String fileType) {
+        try {
+            // Step 1
+            String fileId = gdriveService.findLatestFile(projectName, fileType);
+
+            // Step 2
+            java.io.File downloadedFile = gdriveService.downloadFile(fileId);
+
+            // Step 3
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(downloadedFile));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + downloadedFile.getName())
+                    .header(HttpHeaders.CONTENT_TYPE, fileType.equals("zip") ? "application/zip" : "application/sql")
+                    .contentLength(downloadedFile.length())
+                    .body(resource);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+
 }
