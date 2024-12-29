@@ -54,7 +54,8 @@ public class Jar {
         return "redirect:/jar/dashboard";
 
     }
-//Sql/File Backup Page loading function
+
+    //Sql/File Backup Page loading function
     @GetMapping(path = "/uploadDownlaodForm")
     public String SqlFileBackupPage(Model theModel) {
 
@@ -65,7 +66,14 @@ public class Jar {
 
 
 
+    //Go Daddy DNS Management System Page Loading Function
+    @GetMapping(path = "/goDaddyPage")
+    public String goDaddyPage(Model theModel) {
 
+
+        return "Home/GoDaddyDnsManagement";
+
+    }
 
 
 }

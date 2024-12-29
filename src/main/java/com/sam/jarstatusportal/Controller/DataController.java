@@ -4,18 +4,18 @@ package com.sam.jarstatusportal.Controller;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import com.sam.jarstatusportal.Entity.Domain;
 import com.sam.jarstatusportal.Entity.JarWebSocketHandler;
 import com.sam.jarstatusportal.Entity.LogWebSocketHandler;
 import com.sam.jarstatusportal.Entity.User;
 import com.sam.jarstatusportal.Service.GdriveService;
+import com.sam.jarstatusportal.Service.GoDaddyService;
 import com.sam.jarstatusportal.Service.JarService;
-import io.opencensus.resource.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +42,9 @@ public class DataController {
     private final Map<String, String> processMap = new HashMap<>();
     @Autowired
     private JarService jarService;
+
+    @Autowired
+    private GoDaddyService goDaddyService;
 
     private static final String VM_IP = "62.72.42.59";
     private static final String VM_USERNAME = "Administrator";
@@ -204,8 +207,6 @@ public class DataController {
     }
 
 
-
-
     //    This is the end point where I start the backup
     @PostMapping("/startBackup")
     public ResponseEntity<String> startBackup(@RequestParam String projectName) {
@@ -214,8 +215,8 @@ public class DataController {
     }
 
     @PostMapping("/downloadBackup")
-    public ResponseEntity<InputStreamResource>  downloadBackup(@RequestParam String projectName,
-                                                               @RequestParam String fileType) {
+    public ResponseEntity<InputStreamResource> downloadBackup(@RequestParam String projectName,
+                                                              @RequestParam String fileType) {
         try {
             // Step 1
             String fileId = gdriveService.findLatestFile(projectName, fileType);
@@ -235,6 +236,16 @@ public class DataController {
         }
     }
 
+
+    @GetMapping("/getdomains")
+    public ResponseEntity<List<Domain>> getDomains() {
+        try {
+            List<Domain> domains = goDaddyService.getDomains();
+            return ResponseEntity.ok(domains);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
 
 }
