@@ -207,6 +207,8 @@
                 <th>Lock</th>
                 <th>Status</th>
                 <th>Actions</th>
+                <th>Generate CSR</th>
+                <th>Verify Domain</th>
             </tr>
             </thead>
             <tbody id="domain-list"></tbody>
@@ -324,6 +326,12 @@
             <td>
                 <button onclick="manageDomain('${domain.domain}')">Manage</button>
             </td>
+              <td>
+                <button class="btn btn-success" onclick="generateCSR('${domain.domain}')">Generate CSR</button>
+            </td>
+             <td>
+                <button class="btn btn-danger" onclick="verifyDomainByZeroSsl('${domain.domain}')">Verify Domain</button>
+            </td>
         </tr>
     `).join('');
         };
@@ -335,10 +343,56 @@
         fetchDomains();
     });
 
+
+
     const manageDomain = (domain) => {
         alert(`Manage domain: ${domain}`);
     };
+    // Function to Generate CSR Certificate started ----------------
+    const generateCSR = async (domain) => {
+        debugger;
+        try {
+            const response = await fetch(`/data/createSslCertificate?domain=${encodeURIComponent(domain)}`, {
+                method: 'POST'
+            });
 
+            if (response.ok) {
+                const result = await response.json();
+                console.log('CSR Generated:', result);
+                alert(`CSR generated for domain: ${domain}\n\nCSR:\n${result.csr}`);
+            } else {
+                console.error('Error generating CSR:', response.statusText);
+                alert('Failed to generate CSR. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while generating CSR.');
+        }
+    };
+    // Function to Generate CSR Certificate Ended ----------------
+
+    // Function to verify Domain By ZeroSsl started ----------------
+    const verifyDomainByZeroSsl = async (domain) => {
+        debugger;
+        try {
+            const response = await fetch(`/data/verifyDomainByZeroSsl?domain=${encodeURIComponent(domain)}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('CSR Generated:', result);
+                alert(`CSR generated for domain: ${domain}\n\nCSR:\n${result.csr}`);
+            } else {
+                console.error('Error generating CSR:', response.statusText);
+                alert('Failed to Verify Domain. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while generating CSR.');
+        }
+    };
+    // Function to verify Domain By ZeroSsl Ended ----------------
 
 </script>
 <!---------------------------Script For SQL Backup Ended----------------------->

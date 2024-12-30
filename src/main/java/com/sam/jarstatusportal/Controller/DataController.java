@@ -11,6 +11,7 @@ import com.sam.jarstatusportal.Entity.User;
 import com.sam.jarstatusportal.Service.GdriveService;
 import com.sam.jarstatusportal.Service.GoDaddyService;
 import com.sam.jarstatusportal.Service.JarService;
+import com.sam.jarstatusportal.Service.ZeroSsLService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -55,6 +56,9 @@ public class DataController {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private ZeroSsLService zeroSSLService;
 
     @GetMapping("/fetchLogs")
     public List<String> fetchLogs(@RequestParam("sessionId") String sessionId) {
@@ -236,7 +240,7 @@ public class DataController {
         }
     }
 
-
+//Go Daddy DNS manager started -------------------------
     @GetMapping("/getdomains")
     public ResponseEntity<List<Domain>> getDomains() {
         try {
@@ -247,5 +251,16 @@ public class DataController {
         }
     }
 
+
+
+    @PostMapping("/createSslCertificate")
+    public String createCertificate(@RequestParam String domain) {
+        return zeroSSLService.createCertificateWithAutoCSR(domain);
+    }
+
+    @PostMapping("/verifyDomainByZeroSsl")
+    public String verifyDomainByZeroSsl(@RequestParam String domain) {
+        return zeroSSLService.verifyDomainByZeroSsl(domain);
+    }
 
 }
