@@ -209,6 +209,7 @@
                 <th>Actions</th>
                 <th>Generate CSR</th>
                 <th>Verify Domain</th>
+                <th>Download Crt</th>
             </tr>
             </thead>
             <tbody id="domain-list"></tbody>
@@ -218,7 +219,6 @@
     <!-------------------------------------Go Daddy DNS Manager Ended ---------------------------------------------------------->
 
 </div>
-
 
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -332,6 +332,9 @@
              <td>
                 <button class="btn btn-danger" onclick="verifyDomainByZeroSsl('${domain.domain}')">Verify Domain</button>
             </td>
+             <td>
+                <button class="btn btn-warning" onclick="downlaodZeroSslCertificate('${domain.domain}')">Download Certificate</button>
+            </td>
         </tr>
     `).join('');
         };
@@ -342,7 +345,6 @@
 
         fetchDomains();
     });
-
 
 
     const manageDomain = (domain) => {
@@ -393,6 +395,31 @@
         }
     };
     // Function to verify Domain By ZeroSsl Ended ----------------
+
+
+    // Function to Downlaod Zero Ssl Certificate started ----------------
+    const downlaodZeroSslCertificate = async (domain) => {
+        debugger;
+        try {
+            const response = await fetch(`/data/downlaodZeroSslCertificate?domain=${encodeURIComponent(domain)}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('CSR Generated:', result);
+                alert(`CSR generated for domain: ${domain}\n\nCSR:\n${result.csr}`);
+            } else {
+                console.error('Error generating CSR:', response.statusText);
+                alert('Failed to Verify Domain. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while generating CSR.');
+        }
+    };
+    // Function to Downlaod Zero Ssl Certificate   Ended ----------------
+
 
 </script>
 <!---------------------------Script For SQL Backup Ended----------------------->

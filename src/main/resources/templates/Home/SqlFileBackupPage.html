@@ -371,9 +371,7 @@
         confirmationModal.hide();
 
 
-
-
-        // API call to download the file  using Blob Storage
+        // API call to download the file  using Blob Storage With Respect To Google Drive
         fetch(`/data/downloadBackup?projectName=${selectedProject}&fileType=${fileType}`, {
             method: "POST"
         })

@@ -240,7 +240,7 @@ public class DataController {
         }
     }
 
-//Go Daddy DNS manager started -------------------------
+    //Go Daddy DNS manager started -------------------------
     @GetMapping("/getdomains")
     public ResponseEntity<List<Domain>> getDomains() {
         try {
@@ -252,15 +252,24 @@ public class DataController {
     }
 
 
-
+    //-----------Generate CSR Mehtod
     @PostMapping("/createSslCertificate")
     public String createCertificate(@RequestParam String domain) {
         return zeroSSLService.createCertificateWithAutoCSR(domain);
     }
 
+    //-----------Verify Domain By Zero SSL
     @PostMapping("/verifyDomainByZeroSsl")
     public String verifyDomainByZeroSsl(@RequestParam String domain) {
         return zeroSSLService.verifyDomainByZeroSsl(domain);
+    }
+
+    //Go Daddy DNS manager Ended -------------------------
+    @PostMapping("/downlaodZeroSslCertificate")
+    public String downlaodZeroSslCertificate(@RequestParam String domain) throws IOException {
+
+
+        return zeroSSLService.downlaodZeroSslCertificate(domain);
     }
 
 }
