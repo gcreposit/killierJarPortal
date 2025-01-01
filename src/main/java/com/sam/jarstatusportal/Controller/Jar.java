@@ -30,6 +30,7 @@ public class Jar {
 
     }
 
+    //    This method is to upload the jar on VM just a get methof for form
     @GetMapping(path = "/jarForm")
     public String jarSubmission(Model theModel) {
 
@@ -63,7 +64,6 @@ public class Jar {
         return "Home/SqlFileBackupPage";
 
     }
-
 
 
     //Go Daddy DNS Management System Page Loading Function

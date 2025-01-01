@@ -59,13 +59,20 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
     @Value("${vm.remoteFilePath}")
     private String remoteFilePath;
 
+    @Value("${vm.remoteNginxFilePath}")
+    private String remoteFileNginxPath;
+
+
+    @Value("${vm.nginxReloadPath}")
+    private String remoteNginxReloadPath;
+
 
     @Autowired
     private RestTemplate restTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(ZeroSsLService.class);
 
-    //-------------------------------- This can be Optimize jsut for the trial I made ,as it will be opimized after production -------------------------------
+    //-------------------------------- This can be Optimize just for the trial I made ,as it will be opimized after production -------------------------------
     private void ensureDirectoryExists(Path directoryPath) {
         try {
             if (directoryPath != null && !Files.exists(directoryPath)) {
@@ -371,10 +378,10 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
             logger.info("Unzip of File  tranfer to VM failed", e, Level.SEVERE);
         }
 
-
+        // -----------------------------   This method is to make CONF File dynamically and Send it to VM  -------------------------------
         try {
             String port = "9999";
-            // Step 1: Create configuration content
+            // Step 1: Create configuration content in the format as discussed with RG
             String configContent = generateConfigContent(domain, port);
 
             // Step 2: Save configuration to a local file
@@ -387,6 +394,20 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        // -----------------------------   This method is to Edit the CONF file VM -------------------------------
+        try {
+            updateNginxConfigOnServer(remoteFileNginxPath, domain, vmUserName, vmIp, vmPassword);
+        } catch (Exception e) {
+            logger.info("CONF Edit File Remains", e, Level.SEVERE);
+        }
+
+        // -----------------------------   This method is to Reload the nginx folder (but first test it nginx -t | nginx -s reload)-------------------------------
+        try {
+            reloadNginxOnRemoteServer(vmUserName, vmIp, vmPassword,remoteNginxReloadPath);
+        } catch (Exception e) {
+            logger.info("Reload the nginx Conf Folder", e, Level.SEVERE);
         }
 
 
@@ -736,6 +757,149 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
             if (session != null && session.isConnected()) {
                 session.disconnect();
                 System.out.println("SSH session disconnected.");
+            }
+        }
+    }
+
+    // --------------------------------- Method to Add include file in Nginx conf -----------------------------
+    public static void updateNginxConfigOnServer(String remoteFileNginxPath, String domainName, String username, String host, String password) throws JSchException, IOException {
+
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelExec channelExec = null;
+
+        try {
+            logger.info("Establishing SSH connection to the server...");
+            session = jsch.getSession(username, host, 22);
+            session.setPassword(password);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+
+            session.connect();
+            logger.info("SSH connection established successfully!");
+
+            // Step 2: Read the current nginx.conf contents
+            logger.info("Reading the current nginx.conf file...");
+            ChannelExec readChannel = (ChannelExec) session.openChannel("exec");
+            String readCommand = "cat " + remoteFileNginxPath; // Command to read the nginx.conf file
+            readChannel.setCommand(readCommand);
+
+            InputStream inputStream = readChannel.getInputStream();
+            readChannel.connect();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder nginxConfContent = new StringBuilder();
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                nginxConfContent.append(line).append("\n");
+            }
+
+            readChannel.disconnect();
+            logger.info("Current nginx.conf contents:\n" + nginxConfContent);
+
+            // Step 3: Prepare the command to edit nginx.conf
+            String command = String.format(
+                    "powershell -Command \"(Get-Content %s) -replace 'http \\{', 'http {include %s.conf;' | Set-Content %s\"",
+                    remoteFileNginxPath, domainName, remoteFileNginxPath
+            );
+            logger.info("Prepared command for updating nginx.conf: " + command);
+
+            // Step 3: Execute the command
+            channelExec = (ChannelExec) session.openChannel("exec");
+            channelExec.setCommand(command);
+
+            channelExec.setErrStream(System.err);
+            OutputStream out = channelExec.getOutputStream();
+            channelExec.connect();
+
+            out.flush();
+            logger.info("Command executed successfully to update nginx.conf.");
+
+        } catch (Exception e) {
+            logger.info("Error while updating nginx.conf: " + e.getMessage(), e, Level.SEVERE);
+            throw e;
+        } finally {
+            // Clean up resources
+            if (channelExec != null && channelExec.isConnected()) {
+                channelExec.disconnect();
+                logger.info("SSH exec channel closed.");
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+                logger.info("SSH session disconnected.");
+            }
+        }
+
+    }
+
+    // --------------------------------- Method to Add Just reload the nginx -s reload (but curretly it for testing) -----------------------------
+    private void reloadNginxOnRemoteServer(String username, String host, String password,String remoteNginxReloadPath) throws JSchException, IOException {
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelExec channelExec = null;
+
+        try {
+            // Step 1: Establish SSH connection
+            session = jsch.getSession(username, host, 22);
+            session.setPassword(password);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+
+            logger.info("Connecting to the VM to reload Nginx...");
+            session.connect();
+            logger.info("SSH connection established!");
+
+            // Step 2: Prepare the Nginx reload command
+            String command = String.format("cd %s && nginx -t", remoteNginxReloadPath);
+
+
+            // Step 3: Execute the reload command
+            channelExec = (ChannelExec) session.openChannel("exec");
+            channelExec.setCommand(command);
+
+            InputStream inputStream = channelExec.getInputStream();
+            InputStream errorStream = channelExec.getErrStream();
+
+            channelExec.connect();
+            logger.info("Reload command executed.");
+
+            // Capture output and errors
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                logger.info("OUTPUT: " + line);
+            }
+            while ((line = errorReader.readLine()) != null) {
+                logger.error("ERROR: " + line);
+            }
+
+            // Check the exit status
+            int exitStatus = channelExec.getExitStatus();
+            if (exitStatus == 0) {
+                logger.info("Nginx reloaded successfully!");
+            } else {
+                logger.error("Failed to reload Nginx. Exit status: " + exitStatus);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error while reloading Nginx: " + e.getMessage(), e);
+            throw e;
+        } finally {
+            // Clean up resources
+            if (channelExec != null && channelExec.isConnected()) {
+                channelExec.disconnect();
+                logger.info("SSH exec channel closed.");
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+                logger.info("SSH session disconnected.");
             }
         }
     }

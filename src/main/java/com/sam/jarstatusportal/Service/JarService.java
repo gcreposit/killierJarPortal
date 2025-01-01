@@ -8,7 +8,6 @@ import java.util.List;
 public interface JarService {
 
 
-
     String uplaodingAllFormData(User user) throws IOException;
 
     List<User> findAllJarsData();
@@ -17,7 +16,7 @@ public interface JarService {
 
     String updationJarFile(User user);
 
-    void savePidIntoDatabase(String pid,Long id);
+    void savePidIntoDatabase(String pid, Long id);
 
     String getPidById(Long id);
 }
