@@ -835,7 +835,7 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
 
     }
 
-    // --------------------------------- Method to Add Just reload the nginx -s reload (but curretly it for testing) -----------------------------
+    // --------------------------------- Method to Add Just reload the nginx -s reload (but currently it for testing) -----------------------------
     private void reloadNginxOnRemoteServer(String username, String host, String password,String remoteNginxReloadPath) throws JSchException, IOException {
         JSch jsch = new JSch();
         Session session = null;
@@ -855,7 +855,8 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
             logger.info("SSH connection established!");
 
             // Step 2: Prepare the Nginx reload command
-            String command = String.format("cd %s && nginx -t", remoteNginxReloadPath);
+//            String command = String.format("cd %s && nginx -t", remoteNginxReloadPath);
+            String command = String.format("cd %s && nginx -s reload", remoteNginxReloadPath);
 
 
             // Step 3: Execute the reload command

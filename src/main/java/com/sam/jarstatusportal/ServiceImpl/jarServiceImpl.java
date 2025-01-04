@@ -125,27 +125,6 @@ public class jarServiceImpl implements JarService {
                         field.set(existingJarData, newValue);
 
 
-//                        MultipartFile multipartFile=user.getJarFile();
-//
-////                        MultipartFile multipartFile = nonResidential.getStructurePicNr();
-//
-//                        if (multipartFile != null && !multipartFile.isEmpty()) {
-//
-//                            String fileName = multipartFile.getOriginalFilename();
-//                            String[] name = fileName.split("\\.");
-//                            int n = name.length - 1;
-//                            String originalName = nonResidential.getBuildingDetail() + "("+timestampMillis.toString()+")"+ "." + name[n];
-//
-//                            String filePath = uploadDirectory + "NonResidential/" + originalName;
-//
-//                            Files.createDirectories(Path.of(filePath).getParent());
-//
-//                            multipartFile.transferTo(new File(filePath));
-//
-//                            existingNonResidential.setUploadPicPath(originalName);
-//
-//                        }
-
 
                         MultipartFile jarFile = user.getJarFile();
                         if (jarFile != null && !jarFile.isEmpty()) {
@@ -176,6 +155,7 @@ public class jarServiceImpl implements JarService {
                     throw new RuntimeException(e);
                 }
             }
+
 
             // Save and return the updated nonResidential object
             jarRepo.save(existingJarData);
@@ -253,6 +233,7 @@ public class jarServiceImpl implements JarService {
                 out.write(buffer, 0, len);
             }
             fis.close();
+
 
             // Signal end of file transfer
             out.write(0);
