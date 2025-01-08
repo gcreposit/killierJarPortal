@@ -10,10 +10,7 @@ import com.sam.jarstatusportal.Entity.Domain;
 import com.sam.jarstatusportal.Entity.JarWebSocketHandler;
 import com.sam.jarstatusportal.Entity.LogWebSocketHandler;
 import com.sam.jarstatusportal.Entity.User;
-import com.sam.jarstatusportal.Service.GdriveService;
-import com.sam.jarstatusportal.Service.GoDaddyService;
-import com.sam.jarstatusportal.Service.JarService;
-import com.sam.jarstatusportal.Service.ZeroSsLService;
+import com.sam.jarstatusportal.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -334,23 +331,19 @@ public class DataController {
         return zeroSSLService.downlaodZeroSslCertificate(domain);
     }
 
+    @Autowired
+    private GoogleAuthService googleAuthService;
 
-    @GetMapping("/getStorage")
-    public HashMap<String, Object> getStorageConfig() throws IOException {
-        HashMap<String, Object> response = new HashMap<>();
-
-        // Prepare project ID and encoded credentials
-        String projectId = "jalshakti-1734933826605";
-        String credentialsFilePath = "/app/resources/jalshakti-1734933826605-883dbf306dbe.json";
-
-        byte[] jsonBytes = Files.readAllBytes(Paths.get(credentialsFilePath));
-        String encodedCredentials = Base64.getEncoder().encodeToString(jsonBytes);
-
-        response.put("projectId", projectId);
-        response.put("credentials", encodedCredentials);
-
-        return response;
+    @GetMapping("/api/token")
+    public String getAccessToken() {
+        try {
+            return googleAuthService.getAccessToken();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error generating access token: " + e.getMessage();
+        }
     }
+
 
 
 }

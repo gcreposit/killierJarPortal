@@ -255,9 +255,21 @@
         const fileName = file.name;
         const apiUrl = `https://storage.googleapis.com/upload/storage/v1/b/${bucketName}/o?uploadType=media&name=${fileName}`;
 
+        // Fetch access token from the Spring Boot endpoint
+        const tokenResponse = await fetch("/data/api/token");
+        const accessToken = await tokenResponse.text();
+        console.log("acessToken IS",accessToken);
+
+        if (!accessToken) {
+            alert("Failed to fetch access token.");
+            return;
+        }
+
+
+
         try {
             // Get OAuth access token
-            const accessToken = "ya29.a0ARW5m75yHeplpLLrCrgSpqoVXE9qepH-JGMDCChWqAFc9xfQX-4sOvf-fYWXC9HOVAb-HJe62Kk80hKESOVhHASLnAXKu-xJZJ8UbIuwvnR3mzxvqveHHCmGVas8o7zFr2wGd-PulLAYYPk8eh48eAXAO0NILgsTZeGQs32VaCgYKAScSARESFQHGX2Mi11UgDtj2BnpafqaNFNH2GQ0175";
+            // const accessToken = "ya29.a0ARW5m75yHeplpLLrCrgSpqoVXE9qepH-JGMDCChWqAFc9xfQX-4sOvf-fYWXC9HOVAb-HJe62Kk80hKESOVhHASLnAXKu-xJZJ8UbIuwvnR3mzxvqveHHCmGVas8o7zFr2wGd-PulLAYYPk8eh48eAXAO0NILgsTZeGQs32VaCgYKAScSARESFQHGX2Mi11UgDtj2BnpafqaNFNH2GQ0175";
 
             // Upload file to Google Cloud Storage
             const response = await fetch(apiUrl, {
