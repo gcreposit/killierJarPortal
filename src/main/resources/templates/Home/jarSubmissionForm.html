@@ -83,7 +83,7 @@
     <!--        </div>-->
     <!--    </form>-->
 
-    <!--  -------------------  For File Uplaod ------------------>
+    <!--  ------------------- This Form Is for Submitting the User File Upload Started------------------------------------------------------>
     <form id="uploadFileTobucket">
         <div class="card">
             <div class="card-body">
@@ -98,45 +98,53 @@
         </div>
 
     </form>
-    <div class="mb-3">
-        <label class="form-label">Jar File:</label>
-        <div class="input-group">
-            <input type="file" id="jarFile" name="jarFile" class="form-control" accept=".jar" required>
-        </div>
-    </div>
 
+    <!--  ------------------- This Form Is for Submitting the User File Upload Started------------------------------------------------------>
+
+    <!----------------------------------    This Form Is for Submitting the User Info  Started---------------------------------------------->
     <form id="uploadForm">
         <div class="card">
             <div class="card-body">
-
-
+                <!------------------------------Developer Name----------------------------->
                 <div class="mb-3">
                     <label class="form-label">Uploading Developer Name:</label>
                     <input type="text" id="developerName" name="developerName" class="form-control" required>
                 </div>
+                <!------------------------------Developer Name----------------------------->
+
                 <div class="mb-3">
                     <label class="form-label">Website Name:</label>
                     <input type="text" id="website" name="website" class="form-control" placeholder="Website Name"
                            required>
                 </div>
+                <!------------------------------Developer Name----------------------------->
+
                 <div class="mb-3">
                     <label class="form-label">Domain Name:</label>
                     <input type="text" id="domain" name="domain" class="form-control" placeholder="Domain Name"
                            required>
                 </div>
+                <!------------------------------Specified Port----------------------------->
+
                 <div class="mb-3">
                     <label class="form-label">Port:</label>
                     <input type="text" id="port" name="port" class="form-control" placeholder="Port" required>
                 </div>
+                <!------------------------------Developer Name----------------------------->
+
                 <div class="mb-3">
                     <label class="form-label">Url:</label>
                     <input type="url" id="url" name="url" class="form-control" placeholder="https://example.com/users/"
                            required>
                 </div>
+                <!------------------------------Date ----------------------------->
+
                 <div class="mb-3">
                     <label class="form-label">Date:</label>
                     <input type="date" id="date" name="date" class="form-control" required>
                 </div>
+                <!------------------------------Month ----------------------------->
+
                 <div class="mb-3">
                     <label class="form-label">Month:</label>
                     <input type="month" id="month" name="month" class="form-control" required>
@@ -164,7 +172,7 @@
         const formData = new FormData(document.getElementById("uploadForm"));
         const fileInput = document.getElementById("jarFile");
         const file = fileInput.files[0];
-        const originalFileName=file.name;
+        const originalFileName = file.name;
 
 
         // Add originalFileName to the formData
@@ -233,6 +241,7 @@
 
 
 <script>
+
     document.getElementById('uploadButton').addEventListener('click', async () => {
         const fileInput = document.getElementById('jarFileExp');
         const file = fileInput.files[0];
@@ -242,8 +251,8 @@
             return;
         }
 
-        const bucketName = 'gpdm_bucket'; // Replace with your bucket name
-        const fileName = file.name; // You can modify this if needed
+        const bucketName = 'gpdm_bucket';
+        const fileName = file.name;
         const apiUrl = `https://storage.googleapis.com/upload/storage/v1/b/${bucketName}/o?uploadType=media&name=${fileName}`;
 
         try {
@@ -271,7 +280,6 @@
             alert(`Error uploading file: ${error.message}`);
         }
     });
-
 
 
 </script>
