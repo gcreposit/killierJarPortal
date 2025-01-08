@@ -340,6 +340,13 @@ public class jarServiceImpl implements JarService {
         logger.info("finalizeUpload completed successfully for filePath: {}", filePath);
     }
 
+    @Override
+    public Storage getInitializeStorage() throws IOException {
+
+        Storage getStorage=initializeStorage();
+        return getStorage;
+    }
+
     //    -------------------------Finalize upload  Ended ---------------------------------------------------------------------------------------
 
 

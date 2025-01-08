@@ -1,6 +1,7 @@
 package com.sam.jarstatusportal.Controller;
 
 
+import com.google.cloud.storage.Storage;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +60,8 @@ public class DataController {
     private static final String VM_USERNAME = "Administrator";
     private static final String VM_PASSWORD = "Pass1197Pass";
 
-
+//------------------------------------------------------------------------------------------------------------------------------------
+//@RequestParam("jarFile") MultipartFile jarFile
     // Generate signed URL for the file upload
     @PostMapping("/generateSignedUrl")
     public ResponseEntity<Map<String, String>> generateSignedUrl(
@@ -68,7 +73,8 @@ public class DataController {
             @RequestParam("date") String date,
             @RequestParam("month") String month,
             @RequestParam("time") String time,
-            @RequestParam("jarFile") MultipartFile jarFile) throws IOException {
+            @RequestParam("jarFileName") String fileName
+           ) throws IOException {
 
         // Create a user object with the extracted data
         User user = new User();
@@ -80,16 +86,21 @@ public class DataController {
         user.setDate(date);
         user.setMonth(month);
         user.setTime(time);
-        user.setJarFile(jarFile);
+//        user.setJarFile(jarFile);
 
-        String fileName = jarFile.getOriginalFilename();
+//        String fileName = jarFile.getOriginalFilename();
+//        String fileName = "sameer";
+
         String signedUrl = jarService.generateSignedUrl(user, fileName);
 
         Map<String, String> response = new HashMap<>();
         response.put("signedUrl", signedUrl);
-        response.put("filePath", "uploaded-jars/" + fileName); // Include file path
+//        String customUrl="https://storage.cloud.google.com/gpdm_bucket/uploaded-jars/";
+        String customUrl="uploaded-jars/";
+        response.put("filePath", customUrl + fileName); // Include file path
         return ResponseEntity.ok(response);
     }
+
 
     // Finalize the upload process
     @PostMapping("/finalizeUpload")
@@ -99,6 +110,8 @@ public class DataController {
         jarService.finalizeUpload(filePath);
         return ResponseEntity.ok("File uploaded and processed successfully.");
     }
+
+//--------------------------------------------------------------------------------------------------------------------------------------
 
     @Autowired
     private GdriveService gdriveService;
@@ -320,5 +333,24 @@ public class DataController {
 
         return zeroSSLService.downlaodZeroSslCertificate(domain);
     }
+
+
+    @GetMapping("/getStorage")
+    public HashMap<String, Object> getStorageConfig() throws IOException {
+        HashMap<String, Object> response = new HashMap<>();
+
+        // Prepare project ID and encoded credentials
+        String projectId = "jalshakti-1734933826605";
+        String credentialsFilePath = "/app/resources/jalshakti-1734933826605-883dbf306dbe.json";
+
+        byte[] jsonBytes = Files.readAllBytes(Paths.get(credentialsFilePath));
+        String encodedCredentials = Base64.getEncoder().encodeToString(jsonBytes);
+
+        response.put("projectId", projectId);
+        response.put("credentials", encodedCredentials);
+
+        return response;
+    }
+
 
 }

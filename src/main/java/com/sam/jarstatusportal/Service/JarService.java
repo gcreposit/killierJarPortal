@@ -1,5 +1,6 @@
 package com.sam.jarstatusportal.Service;
 
+import com.google.cloud.storage.Storage;
 import com.jcraft.jsch.JSchException;
 import com.sam.jarstatusportal.Entity.User;
 
@@ -24,4 +25,6 @@ public interface JarService {
     String generateSignedUrl(User user, String fileName) throws IOException;
 
     void finalizeUpload(String filePath) throws IOException, JSchException;
+
+    Storage getInitializeStorage() throws IOException;
 }

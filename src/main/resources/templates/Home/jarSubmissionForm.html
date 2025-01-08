@@ -24,88 +24,105 @@
 <body>
 <div class="container">
     <h2>Upload JAR File</h2>
-<!--    <form  id="uploadForm" >-->
-<!--        &lt;!&ndash;        <div class="form-group">&ndash;&gt;-->
-<!--        &lt;!&ndash;            <label for="jarFile">Select JAR File:</label>&ndash;&gt;-->
-<!--        &lt;!&ndash;            <input type="file" id="jarFile" name="jarFile" accept=".jar" class="form-control" required>&ndash;&gt;-->
-<!--        &lt;!&ndash;        </div>&ndash;&gt;-->
-<!--        <div class="card">-->
-<!--            <div class="card-body">-->
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">Jar File:</label>-->
-<!--                    <input type="file" name="jarFile" class="form-control">-->
-<!--                </div>-->
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">Uplaoding Developer Name:</label>-->
-<!--                    <input type="text" id="developerName" name="developerName" class="form-control">-->
-<!--                </div>-->
+    <!--    <form  id="uploadForm" >-->
+    <!--        &lt;!&ndash;        <div class="form-group">&ndash;&gt;-->
+    <!--        &lt;!&ndash;            <label for="jarFile">Select JAR File:</label>&ndash;&gt;-->
+    <!--        &lt;!&ndash;            <input type="file" id="jarFile" name="jarFile" accept=".jar" class="form-control" required>&ndash;&gt;-->
+    <!--        &lt;!&ndash;        </div>&ndash;&gt;-->
+    <!--        <div class="card">-->
+    <!--            <div class="card-body">-->
+    <!--                <div class="mb-3">-->
+    <!--                    <label class="form-label">Jar File:</label>-->
+    <!--                    <input type="file" name="jarFile" class="form-control">-->
+    <!--                </div>-->
+    <!--                <div class="mb-3">-->
+    <!--                    <label class="form-label">Uplaoding Developer Name:</label>-->
+    <!--                    <input type="text" id="developerName" name="developerName" class="form-control">-->
+    <!--                </div>-->
 
 
+    <!--                <div class="mb-3">-->
+    <!--                    <label class="form-label">Website Name:</label>-->
+    <!--                    <input type="text"   id="website" name="website" class="form-control" placeholder="Website Nam">-->
+    <!--                </div>-->
+
+    <!--                <div class="mb-3">-->
+    <!--                    <label class="form-label">Domain Name:</label>-->
+    <!--                    <input type="text" id="domain" name="domain"  class="form-control" placeholder="Domain Name">-->
+    <!--                </div>-->
+    <!--                <div class="mb-3">-->
+    <!--                    <label class="form-label">Port:</label>-->
+    <!--                    <input type="text"  id="port" name="port" class="form-control" placeholder="Port">-->
+    <!--                </div>-->
+    <!--                <div class="mb-3">-->
+    <!--                    <label class="form-label">Url:</label>-->
+    <!--                    <input type="url"  id="url" name="url" class="form-control" placeholder="https://example.com/users/">-->
+    <!--                </div>-->
+
+    <!--                <div class="mb-3">-->
+    <!--                    <label class="form-label">Date:</label>-->
+    <!--                    <input type="date" id="date" name="date"  class="form-control">-->
+    <!--                </div>-->
+    <!--                <div class="mb-3">-->
+    <!--                    <label class="form-label">Month:</label>-->
+    <!--                    <input type="month"  id="month" name="month" class="form-control">-->
+    <!--                </div>-->
 
 
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">Website Name:</label>-->
-<!--                    <input type="text"   id="website" name="website" class="form-control" placeholder="Website Nam">-->
-<!--                </div>-->
-
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">Domain Name:</label>-->
-<!--                    <input type="text" id="domain" name="domain"  class="form-control" placeholder="Domain Name">-->
-<!--                </div>-->
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">Port:</label>-->
-<!--                    <input type="text"  id="port" name="port" class="form-control" placeholder="Port">-->
-<!--                </div>-->
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">Url:</label>-->
-<!--                    <input type="url"  id="url" name="url" class="form-control" placeholder="https://example.com/users/">-->
-<!--                </div>-->
-
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">Date:</label>-->
-<!--                    <input type="date" id="date" name="date"  class="form-control">-->
-<!--                </div>-->
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">Month:</label>-->
-<!--                    <input type="month"  id="month" name="month" class="form-control">-->
-<!--                </div>-->
+    <!--                <div class="mb-3">-->
+    <!--                    <label class="form-label">Time:</label>-->
+    <!--                    <input type="time"  id="time" name="time" class="form-control">-->
+    <!--                </div>-->
 
 
-<!--                <div class="mb-3">-->
-<!--                    <label class="form-label">Time:</label>-->
-<!--                    <input type="time"  id="time" name="time" class="form-control">-->
-<!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
 
+    <!--        <div class="text-center"> &lt;!&ndash; or use d-flex justify-content-center &ndash;&gt;-->
+    <!--            <button type="submit" class="btn btn-primary">Upload</button>-->
+    <!--        </div>-->
+    <!--    </form>-->
 
-
-<!--            </div>-->
-<!--        </div>-->
-
-<!--        <div class="text-center"> &lt;!&ndash; or use d-flex justify-content-center &ndash;&gt;-->
-<!--            <button type="submit" class="btn btn-primary">Upload</button>-->
-<!--        </div>-->
-<!--    </form>-->
-
-
-
-    <form id="uploadForm">
+    <!--  -------------------  For File Uplaod ------------------>
+    <form id="uploadFileTobucket">
         <div class="card">
             <div class="card-body">
                 <div class="mb-3">
                     <label class="form-label">Jar File:</label>
-                    <input type="file" id="jarFile" name="jarFile" class="form-control" accept=".jar" required>
+                    <div class="input-group">
+                        <input type="file" id="jarFileExp" name="jarFile" class="form-control" accept=".jar" required>
+                        <button type="button" id="uploadButton" class="btn btn-primary">Upload</button>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+    </form>
+    <div class="mb-3">
+        <label class="form-label">Jar File:</label>
+        <div class="input-group">
+            <input type="file" id="jarFile" name="jarFile" class="form-control" accept=".jar" required>
+        </div>
+    </div>
+
+    <form id="uploadForm">
+        <div class="card">
+            <div class="card-body">
+
+
                 <div class="mb-3">
                     <label class="form-label">Uploading Developer Name:</label>
                     <input type="text" id="developerName" name="developerName" class="form-control" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Website Name:</label>
-                    <input type="text" id="website" name="website" class="form-control" placeholder="Website Name" required>
+                    <input type="text" id="website" name="website" class="form-control" placeholder="Website Name"
+                           required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Domain Name:</label>
-                    <input type="text" id="domain" name="domain" class="form-control" placeholder="Domain Name" required>
+                    <input type="text" id="domain" name="domain" class="form-control" placeholder="Domain Name"
+                           required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Port:</label>
@@ -113,7 +130,8 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Url:</label>
-                    <input type="url" id="url" name="url" class="form-control" placeholder="https://example.com/users/" required>
+                    <input type="url" id="url" name="url" class="form-control" placeholder="https://example.com/users/"
+                           required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Date:</label>
@@ -138,6 +156,7 @@
 
 </div>
 
+<!--Script For Generating Signed UR------------L-->
 <script>
     document.getElementById("uploadForm").addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -145,6 +164,11 @@
         const formData = new FormData(document.getElementById("uploadForm"));
         const fileInput = document.getElementById("jarFile");
         const file = fileInput.files[0];
+        const originalFileName=file.name;
+
+
+        // Add originalFileName to the formData
+        formData.append("jarFileName", originalFileName);
 
         if (!file) {
             alert("Please select a file.");
@@ -165,7 +189,7 @@
                 throw new Error("Failed to get signed URL from backend.");
             }
 
-            const { signedUrl, filePath } = await response.json();
+            const {signedUrl, filePath} = await response.json();
 
             // Step 2: Upload file to Google Cloud Storage
             const uploadResponse = await fetch(signedUrl, {
@@ -175,6 +199,9 @@
                     "Content-Type": "application/octet-stream",
                 },
             });
+
+            // Log the response for debugging
+            console.log("Upload Response:", uploadResponse);
 
             if (!uploadResponse.ok) {
                 throw new Error("Failed to upload file to Google Cloud Storage.");
@@ -188,7 +215,7 @@
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ filePath }),
+                body: JSON.stringify({filePath}),
             });
 
             if (!finalizeResponse.ok) {
@@ -203,6 +230,148 @@
     });
 
 </script>
+
+
+<script>
+    document.getElementById('uploadButton').addEventListener('click', async () => {
+        const fileInput = document.getElementById('jarFileExp');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert('Please select a file to upload.');
+            return;
+        }
+
+        const bucketName = 'gpdm_bucket'; // Replace with your bucket name
+        const fileName = file.name; // You can modify this if needed
+        const apiUrl = `https://storage.googleapis.com/upload/storage/v1/b/${bucketName}/o?uploadType=media&name=${fileName}`;
+
+        try {
+            // Get OAuth access token
+            const accessToken = "ya29.a0ARW5m75yHeplpLLrCrgSpqoVXE9qepH-JGMDCChWqAFc9xfQX-4sOvf-fYWXC9HOVAb-HJe62Kk80hKESOVhHASLnAXKu-xJZJ8UbIuwvnR3mzxvqveHHCmGVas8o7zFr2wGd-PulLAYYPk8eh48eAXAO0NILgsTZeGQs32VaCgYKAScSARESFQHGX2Mi11UgDtj2BnpafqaNFNH2GQ0175";
+
+            // Upload file to Google Cloud Storage
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Content-Type': file.type,
+                },
+                body: file,
+            });
+
+            if (response.ok) {
+                alert('File uploaded successfully!');
+            } else {
+                const errorText = await response.text();
+                alert(`File upload failed: ${response.statusText}\n${errorText}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`Error uploading file: ${error.message}`);
+        }
+    });
+
+
+
+</script>
+
+<!--<script th:inline="javascript">-->
+
+
+<!--    async function getStorageConfig() {-->
+<!--        try {-->
+<!--            const response = await fetch('/data/getStorage');-->
+<!--            if (!response.ok) {-->
+<!--                throw new Error('Failed to fetch storage configuration');-->
+<!--            }-->
+<!--            const config = await response.json();-->
+<!--            console.log('Storage Configuration:', config);-->
+<!--            return config;-->
+<!--        } catch (error) {-->
+<!--            console.error('Error fetching storage configuration:', error);-->
+<!--            throw error;-->
+<!--        }-->
+<!--    }-->
+
+<!--    async function generateSignedUrl(bucketName, fileName) {-->
+<!--        // const { Storage } = require('@google-cloud/storage');-->
+
+<!--        try {-->
+<!--            // Fetch configuration from backend-->
+<!--            const { projectId, credentials } = await getStorageConfig();-->
+
+<!--            // Decode credentials and initialize Storage-->
+<!--            const decodedCredentials = atob(credentials);-->
+<!--            const storage = new Storage({-->
+<!--                projectId: projectId,-->
+<!--                credentials: JSON.parse(decodedCredentials),-->
+<!--            });-->
+
+<!--            // Generate signed URL-->
+<!--            const [url] = await storage.bucket(bucketName).file(fileName).getSignedUrl({-->
+<!--                version: 'v4',-->
+<!--                action: 'write',-->
+<!--                expires: Date.now() + 15 * 60 * 1000, // 15 minutes expiration-->
+<!--                contentType: 'application/octet-stream',-->
+<!--            });-->
+
+<!--            console.log('Signed URL:', url);-->
+<!--            return url;-->
+<!--        } catch (error) {-->
+<!--            console.error('Error generating signed URL:', error);-->
+<!--            throw error;-->
+<!--        }-->
+<!--    }-->
+
+<!--    // -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;This method is to upload the file to GCS&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+<!--    async function uploadFileToGCS() {-->
+<!--        const fileInput = document.getElementById('jarFile');-->
+<!--        const file = fileInput.files[0];-->
+<!--        if (!file) {-->
+<!--            alert('Please select a file to upload.');-->
+<!--            return;-->
+<!--        }-->
+
+<!--        const statusDiv = document.getElementById('status');-->
+<!--        statusDiv.textContent = 'Generating signed URL...';-->
+
+<!--        try {-->
+<!--            const bucketName = 'your-bucket-name';-->
+<!--            const fileName = `uploads/${file.name}`; // Path inside the bucket-->
+
+<!--            // Generate the signed URL-->
+<!--            const signedUrl = await generateSignedUrl(bucketName, fileName);-->
+<!--            statusDiv.textContent = 'Signed URL generated. Uploading file...';-->
+
+<!--            // Upload the file to the signed URL-->
+<!--            const response = await fetch(signedUrl, {-->
+<!--                method: 'PUT',-->
+<!--                headers: {-->
+<!--                    'Content-Type': 'application/octet-stream',-->
+<!--                },-->
+<!--                body: file,-->
+<!--            });-->
+
+<!--            if (!response.ok) {-->
+<!--                throw new Error('Failed to upload file.');-->
+<!--            }-->
+
+<!--            statusDiv.textContent = 'File uploaded successfully!';-->
+<!--        } catch (error) {-->
+<!--            console.error('Error during file upload:', error);-->
+<!--            statusDiv.textContent = 'An error occurred during the upload process.';-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Event listener for the upload button-->
+<!--    document.getElementById('uploadButton').addEventListener('click', uploadFileToGCS);-->
+<!--</script>-->
+
+
+<!--</script>-->
+
+
 </body>
 
 </html>
