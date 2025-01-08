@@ -43,7 +43,7 @@ public class Jar {
     @PostMapping(path = "/jarSubmit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String creationJarFile(@ModelAttribute User user) throws IOException {
 
-        String message = jarService.uplaodingAllFormData(user);
+//        String message = jarService.uplaodingAllFormData(user);
         return "redirect:/jar/jarForm";
 
     }

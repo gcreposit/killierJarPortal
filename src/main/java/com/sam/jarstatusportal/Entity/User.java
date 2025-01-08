@@ -37,6 +37,8 @@ public class User {
 
     private String pidId;
 
+    private String originalFileName;
+
 
     private String date;
     private String month;

@@ -28,6 +28,10 @@
     </scm>
     <properties>
         <java.version>17</java.version>
+        <!-- SonarQube Properties -->
+        <sonar.projectKey>killer-Jar-Portal</sonar.projectKey> <!-- Replace with your project key -->
+        <sonar.host.url>http://localhost:9000</sonar.host.url> <!-- URL of your SonarQube instance -->
+        <sonar.login>sqp_903cb82d34fc2eddd2af3f545b78a40379adea45</sonar.login> <!-- Replace with your token -->
     </properties>
     <dependencies>
         <dependency>
@@ -102,7 +106,6 @@
         </dependency>
 
 
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -110,8 +113,7 @@
         </dependency>
 
 
-
-        <!--Google Drive Dependencies-->
+        <!--Google Drive Dependencies Started-->
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-drive</artifactId>
@@ -128,6 +130,8 @@
             <artifactId>google-oauth-client-jetty</artifactId>
             <version>1.35.0</version>
         </dependency>
+        <!--Google Drive Dependencies Started-->
+
 
         <!-- SL4J for Java -->
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -165,15 +169,23 @@
         </dependency>
 
 
-<!--        Google Cloud Dependecny-->
+        <!--Google Cloud Dependency Storage Usage For Bucket -->
         <!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-storage -->
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage</artifactId>
             <version>2.44.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 
 
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-security</artifactId>-->
+        <!--        </dependency>-->
 
     </dependencies>
 
@@ -190,6 +202,33 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+
+            <!-- SonarQube Maven Plugin -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.9.1.2184</version> <!-- Replace with the latest version -->
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

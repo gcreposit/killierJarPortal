@@ -15,8 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
+
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Comparator;
 import java.util.List;
@@ -28,7 +32,7 @@ public class GdriveServiceImpl implements GdriveService {
 
     private String googleDriveParentFolderId = "1TghigQdBizCe30Nbj9GffmcY8wiwXfll";
 
-    private static final String SERVICE_ACCOUNT_FILE = "src/main/resources/jalshakti-1734933826605-883dbf306dbe.json";
+//    private static final String SERVICE_ACCOUNT_FILE = "src/main/resources/jalshakti-1734933826605-883dbf306dbe.json";
     private static final String APPLICATION_NAME = "jalshaktiSqlDisasterManagement";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
@@ -40,7 +44,25 @@ public class GdriveServiceImpl implements GdriveService {
 
     //    For Initializing the Drive
     private Drive initializeDriveService() throws IOException, GeneralSecurityException {
-        GoogleCredential credential = GoogleCredential.fromStream(new FileInputStream(SERVICE_ACCOUNT_FILE))
+
+        InputStream jsonStream;
+        String externalFilePath = "/app/resources/jalshakti-1734933826605-883dbf306dbe.json";
+
+        java.io.File  externalFile = new java.io.File(externalFilePath);
+        if (externalFile.exists()) {
+            // Load the file from the external location in Docker
+            jsonStream = new FileInputStream(externalFile);
+        }
+        else {
+            // Load the file from the classpath (Local environment)
+            String jsonFilePath = getClass()
+                    .getClassLoader()
+                    .getResource("jalshakti-1734933826605-883dbf306dbe.json")
+                    .getPath();
+            jsonStream = new FileInputStream(jsonFilePath);
+        }
+
+        GoogleCredential credential = GoogleCredential.fromStream(jsonStream)
                 .createScoped(List.of(DriveScopes.DRIVE_FILE));
 
         return new Drive.Builder(GoogleNetHttpTransport.newTrustedTransport(), JSON_FACTORY, credential)

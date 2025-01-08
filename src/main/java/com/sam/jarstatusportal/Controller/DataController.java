@@ -3,6 +3,7 @@ package com.sam.jarstatusportal.Controller;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.sam.jarstatusportal.Entity.Domain;
 import com.sam.jarstatusportal.Entity.JarWebSocketHandler;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.HashMap;
@@ -40,7 +42,10 @@ public class DataController {
 
     private static final ConcurrentHashMap<String, Process> activeProcesses = new ConcurrentHashMap<>();
 
+
     private final Map<String, String> processMap = new HashMap<>();
+
+
     @Autowired
     private JarService jarService;
 
@@ -50,6 +55,50 @@ public class DataController {
     private static final String VM_IP = "62.72.42.59";
     private static final String VM_USERNAME = "Administrator";
     private static final String VM_PASSWORD = "Pass1197Pass";
+
+
+    // Generate signed URL for the file upload
+    @PostMapping("/generateSignedUrl")
+    public ResponseEntity<Map<String, String>> generateSignedUrl(
+            @RequestParam("developerName") String developerName,
+            @RequestParam("website") String website,
+            @RequestParam("domain") String domain,
+            @RequestParam("port") String port,
+            @RequestParam("url") String url,
+            @RequestParam("date") String date,
+            @RequestParam("month") String month,
+            @RequestParam("time") String time,
+            @RequestParam("jarFile") MultipartFile jarFile) throws IOException {
+
+        // Create a user object with the extracted data
+        User user = new User();
+        user.setDeveloperName(developerName);
+        user.setWebsite(website);
+        user.setDomain(domain);
+        user.setPort(port);
+        user.setUrl(url);
+        user.setDate(date);
+        user.setMonth(month);
+        user.setTime(time);
+        user.setJarFile(jarFile);
+
+        String fileName = jarFile.getOriginalFilename();
+        String signedUrl = jarService.generateSignedUrl(user, fileName);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("signedUrl", signedUrl);
+        response.put("filePath", "uploaded-jars/" + fileName); // Include file path
+        return ResponseEntity.ok(response);
+    }
+
+    // Finalize the upload process
+    @PostMapping("/finalizeUpload")
+    public ResponseEntity<String> finalizeUpload(@RequestBody Map<String, String> payload) throws IOException, JSchException {
+        String filePath = payload.get("filePath");
+
+        jarService.finalizeUpload(filePath);
+        return ResponseEntity.ok("File uploaded and processed successfully.");
+    }
 
     @Autowired
     private GdriveService gdriveService;

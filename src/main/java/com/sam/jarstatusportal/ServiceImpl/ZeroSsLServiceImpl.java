@@ -32,11 +32,11 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
     @Value("${zerossl.api.key}")
     private String apiKey;
 
-    @Value("${csr.upload.directory}")
-    private String csrFilePath;
-
-    @Value("${csrKey.upload.directory}")
-    private String keyFilePath;
+//    @Value("${csr.upload.directory}")
+//    private String csrFilePath;
+//
+//    @Value("${csrKey.upload.directory}")
+//    private String keyFilePath;
 
     @Value("${godaddy.api.key}")
     private String godaddyApiKey;
@@ -94,12 +94,39 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
 
 
 // Ensure parent directories exist or create them
-        ensureDirectoryExists(Paths.get(csrFilePath).getParent());
-        ensureDirectoryExists(Paths.get(keyFilePath).getParent());
+//        ensureDirectoryExists(Paths.get(csrFilePath).getParent());
+//        ensureDirectoryExists(Paths.get(keyFilePath).getParent());
+
+
+        // Create a temporary directory
+        Path tempDir;
+        try {
+            tempDir = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")), "cert-gen-");
+            logger.info("Temporary directory created at: " + tempDir.toAbsolutePath());
+        } catch (IOException e) {
+            logger.error("Failed to create a temporary directory: {}", e.getMessage());
+            throw new RuntimeException("Could not create temporary directory", e);
+        }
+
+        // Define temporary paths for the key and CSR files
+        Path tempKeyFilePath = tempDir.resolve("private.key");
+        Path tempCSRFilePath = tempDir.resolve("csr.pem");
 
         try {
             logger.info("Generating CSR using OpenSSL...");
-            ProcessBuilder processBuilder = new ProcessBuilder("C:\\Program Files\\OpenSSL-Win64\\bin\\openssl", "req", "-nodes", "-newkey", "rsa:2048", "-sha256", "-keyout", keyFilePath, "-out", csrFilePath, "-subj", "/CN=" + domain, "-config", "C:\\Program Files\\OpenSSL-Win64\\bin\\cnf\\openssl.cnf");
+//            ProcessBuilder processBuilder = new ProcessBuilder("C:\\Program Files\\OpenSSL-Win64\\bin\\openssl", "req", "-nodes", "-newkey", "rsa:2048", "-sha256", "-keyout", tempKeyFilePath.toString(), "-out", tempCSRFilePath.toString(), "-subj", "/CN=" + domain, "-config", "C:\\Program Files\\OpenSSL-Win64\\bin\\cnf\\openssl.cnf");
+
+//          New Process Build
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                    "/usr/bin/openssl",
+                    "req", "-nodes", "-newkey", "rsa:2048", "-sha256",
+                    "-keyout", tempKeyFilePath.toString(),
+                    "-out", tempCSRFilePath.toString(),
+                    "-subj", "/CN=" + domain
+            );
+
+
+
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
@@ -117,6 +144,16 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
                 throw new RuntimeException("OpenSSL CSR generation failed.");
             }
             logger.info("CSR and private key generated successfully.");
+
+
+
+
+            // Transfer the private key to the remote VM
+            transferPrivateKeyToVM(domain, tempKeyFilePath.toString(), remoteFilePath, vmUserName, vmIp, vmPassword);
+
+
+
+
         } catch (Exception e) {
             logger.error("Error generating CSR: {}", e.getMessage());
             throw new RuntimeException("Error generating CSR: ", e);
@@ -125,7 +162,7 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
         // Read the generated CSR file
         String csrContent;
         try {
-            csrContent = new String(Files.readAllBytes(Paths.get(csrFilePath)));
+            csrContent = new String(Files.readAllBytes(Paths.get(tempCSRFilePath.toString())));
         } catch (IOException e) {
             logger.error("Failed to read CSR file: {}", e.getMessage());
             throw new RuntimeException("Error reading CSR file: ", e);
@@ -354,26 +391,33 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
         String urlString = "https://api.zerossl.com/certificates/" + certificateId + "/download?access_key=" + apiKey;
 
         // Step 3: Define the local file path
-        String localFilePath = uploadDir + domain + "_certificate.zip";
+//        String localFilePath = uploadDir + domain + "_certificate.zip";
+
+
+        Path tempDirForDownlaodingZip = Files.createTempDirectory(Paths.get(System.getProperty("java.io.tmpdir")), "certificate-download-");
+        logger.info("Temporary directory created at: " + tempDirForDownlaodingZip.toAbsolutePath());
+        Path tempFilePath = tempDirForDownlaodingZip.resolve(domain + "_certificate.zip");
+        logger.info("Temporary file path: " + tempFilePath.toAbsolutePath());
+
 
         // Step 4: Download the certificate by leveraging the api of Zero SSL
-        downloadZipFile(urlString, localFilePath);
+        downloadZipFile(urlString, tempFilePath.toString());
 
         // Step Imp: Extract ZIP file to temporary directory
-        Path tempDir = extractZipToTemp(localFilePath);
+        Path tempDir = extractZipToTemp(tempFilePath.toString());
         logger.info("Unzip of File Succesfully", tempDir);
 
 
         // -----------------------------   This method is to Transfer Zip File to VM -------------------------------
         try {
-            transferFileToVM(localFilePath, remoteFilePath, vmUserName, vmIp, vmPassword);
+            transferFileToVM(tempFilePath.toString(), remoteFilePath, vmUserName, vmIp, vmPassword);
         } catch (Exception e) {
             logger.info("File transfer failed", e, Level.SEVERE);
         }
 
         // -----------------------------   This method is to Transfer Extracted Zip File to VM (It involves several steps first making it cpy to Temp File and then Transfer to VM-------------------------------
         try {
-            transferExtractedFilesToVM(tempDir, remoteFilePath, vmUserName, vmIp, vmPassword, domain, keyFilePath);
+            transferExtractedFilesToVM(tempDir, remoteFilePath, vmUserName, vmIp, vmPassword, domain);
         } catch (Exception e) {
             logger.info("Unzip of File  tranfer to VM failed", e, Level.SEVERE);
         }
@@ -405,14 +449,22 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
 
         // -----------------------------   This method is to Reload the nginx folder (but first test it nginx -t | nginx -s reload)-------------------------------
         try {
-            reloadNginxOnRemoteServer(vmUserName, vmIp, vmPassword,remoteNginxReloadPath);
+            reloadNginxOnRemoteServer(vmUserName, vmIp, vmPassword, remoteNginxReloadPath);
         } catch (Exception e) {
             logger.info("Reload the nginx Conf Folder", e, Level.SEVERE);
         }
 
 
-        System.out.println("Certificate downloaded to: " + localFilePath);
-        return localFilePath;
+        System.out.println("Certificate downloaded to: " + tempFilePath.toString());
+        // Step 5: Cleanup the temporary file and directory
+//        try {
+//            Files.deleteIfExists(tempFilePath);
+//            Files.deleteIfExists(tempDir);
+//            logger.info("Temporary file and directory cleaned up.");
+//        } catch (IOException e) {
+//            logger.warn("Failed to clean up temporary files: " + e.getMessage());
+//        }
+        return "Certificate Is Downloaded";
 
 
     }
@@ -547,7 +599,7 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
     }
 
     // -----------------------------    This method is to Transfer Extraction of Zip File to VM (Note I used Recursively sending the file but before creation of Remote folder using SCP so it solved my Issue) -------------------------------
-    public static void transferExtractedFilesToVM(Path localDir, String remoteDir, String username, String host, String password, String domain, String keyFilePath) throws JSchException, IOException, SftpException {
+    public static void transferExtractedFilesToVM(Path localDir, String remoteDir, String username, String host, String password, String domain) throws JSchException, IOException, SftpException {
         JSch jsch = new JSch();
         Session session = null;
         ChannelSftp sftpChannel = null;
@@ -582,15 +634,16 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
                 logger.info("Remote folder already exists: " + remoteFolder);
             }
 
-
-            //--------Here I am sending the private key to the location on VM ------------
-            File privateKeyFile = new File(keyFilePath);
-            if (privateKeyFile.exists()) {
-                sftpChannel.put(privateKeyFile.getAbsolutePath(), remoteFolder + "/private.key");
-                logger.info("Transferred private.key to: " + remoteFolder);
-            } else {
-                logger.info("private.key file not found at: " + keyFilePath);
-            }
+////----------------------------------------------------------------------------------------------This I have to transfer the private.key anyhow to VM --------------
+//            //--------Here I am sending the private key to the location on VM ------------
+//            File privateKeyFile = new File(keyFilePath);
+//            if (privateKeyFile.exists()) {
+//                sftpChannel.put(privateKeyFile.getAbsolutePath(), remoteFolder + "/private.key");
+//                logger.info("Transferred private.key to: " + remoteFolder);
+//            } else {
+//                logger.info("private.key file not found at: " + keyFilePath);
+//            }
+////----------------------------------------------------------------------------------------------This I have to transfer the private.key anyhow to VM -------------------
 
 
             logger.info("Starting recursive transfer of extracted files...");
@@ -836,7 +889,7 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
     }
 
     // --------------------------------- Method to Add Just reload the nginx -s reload (but currently it for testing) -----------------------------
-    private void reloadNginxOnRemoteServer(String username, String host, String password,String remoteNginxReloadPath) throws JSchException, IOException {
+    private void reloadNginxOnRemoteServer(String username, String host, String password, String remoteNginxReloadPath) throws JSchException, IOException {
         JSch jsch = new JSch();
         Session session = null;
         ChannelExec channelExec = null;
@@ -904,6 +957,72 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
             }
         }
     }
+
+
+    public void transferPrivateKeyToVM(String domain, String localFilePath, String remoteDir, String username, String host, String password) throws IOException, JSchException, SftpException {
+        JSch jsch = new JSch();
+        Session session = null;
+        ChannelSftp sftpChannel = null;
+
+
+
+
+
+        try {
+            // Step 1: Establish SSH connection
+            session = jsch.getSession(username, host, 22);
+            session.setPassword(password);
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+
+            logger.info("Connecting to the VM...");
+            session.connect();
+            logger.info("Connection established!");
+
+            // Step 2: Create or verify the remote folder
+            String editedDomainName = domain.replace(".com", "");
+            String remoteFolder = remoteDir + "/ssl_" + editedDomainName;
+
+            sftpChannel = (ChannelSftp) session.openChannel("sftp");
+            sftpChannel.connect();
+            logger.info("SFTP channel opened.");
+
+            try {
+                sftpChannel.mkdir(remoteFolder);
+                logger.info("Created remote folder: " + remoteFolder);
+            } catch (SftpException e) {
+                logger.info("Remote folder already exists: " + remoteFolder);
+            }
+
+
+            // Step 3: Transfer the private key file
+            File localFile = new File(localFilePath);
+            if (!localFile.exists()) {
+                throw new IOException("Local file not found: " + localFilePath);
+            }
+
+            // Construct remote file path
+            String remoteFilePath = remoteFolder + "/" + localFile.getName();
+            sftpChannel.put(localFile.getAbsolutePath(), remoteFilePath);
+            logger.info("Transferred file: " + localFile.getAbsolutePath() + " to " + remoteFilePath);
+        } catch (Exception e) {
+            logger.error("Error during private key transfer: {}", e.getMessage(), e);
+            throw e;
+        } finally {
+            // Clean up resources
+            if (sftpChannel != null && sftpChannel.isConnected()) {
+                sftpChannel.disconnect();
+                logger.info("SFTP channel closed.");
+            }
+            if (session != null && session.isConnected()) {
+                session.disconnect();
+                logger.info("SSH session disconnected.");
+            }
+        }
+    }
+
 
 
 }

@@ -1,5 +1,6 @@
 package com.sam.jarstatusportal.Service;
 
+import com.jcraft.jsch.JSchException;
 import com.sam.jarstatusportal.Entity.User;
 
 import java.io.IOException;
@@ -19,4 +20,8 @@ public interface JarService {
     void savePidIntoDatabase(String pid, Long id);
 
     String getPidById(Long id);
+
+    String generateSignedUrl(User user, String fileName) throws IOException;
+
+    void finalizeUpload(String filePath) throws IOException, JSchException;
 }

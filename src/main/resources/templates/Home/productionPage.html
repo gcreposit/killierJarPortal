@@ -507,7 +507,8 @@
 
     function justToReconnectWebsocket(sessionId, consoleId) {
         const consoleDiv = document.getElementById(consoleId);
-        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
 
         socket.onopen = () => {
             consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
@@ -536,7 +537,10 @@
         console.log("redis SessionId", sessionId)
         console.log("redis consoleId", consoleId)
         const consoleDiv = document.getElementById(consoleId);
-        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
+
+
 
         socket.onopen = () => {
             consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
