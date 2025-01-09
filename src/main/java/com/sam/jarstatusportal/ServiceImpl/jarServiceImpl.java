@@ -315,29 +315,29 @@ public class jarServiceImpl implements JarService {
     //    -------------------------Finalize upload  Started ---------------------------------------------------------------------------------------
 
     @Override
-    public void finalizeUpload(String filePath) throws IOException, JSchException {
+    public void finalizeUpload(User user) throws IOException, JSchException {
 
-        logger.info("filePath: {}", filePath);
+        logger.info("filePath: {}", user.getBucketFilePath());
         // Extract the required portion (_dev4.jar) from the filePath
-        String extractedFileName = filePath.substring(filePath.lastIndexOf("/") + 1);
-        logger.info("Extracted file name: {}", extractedFileName);
+//        String extractedFileName = filePath.substring(filePath.lastIndexOf("/") + 1);
+        logger.info("Extracted file name: {}", user.getOriginalFileName());
 
-        java.io.File downloadedFile = downloadFromGCS(BUCKET_NAME, filePath);
+        java.io.File downloadedFile = downloadFromGCS(BUCKET_NAME,  user.getOriginalFileName());
 
-        User user = getTemporaryUserData(extractedFileName); // Retrieve temporary data
+//        User user = getTemporaryUserData(extractedFileName); // Retrieve temporary data
 
         // Transfer the file to the VM
-        transferFileToVM(downloadedFile.getAbsolutePath(), remoteJarUploadPath + "/" + extractedFileName,
+        transferFileToVM(downloadedFile.getAbsolutePath(), remoteJarUploadPath + "/" + user.getOriginalFileName(),
                 vmUserName, vmIp, vmPassword);
 
 
-        user.setJarFilePath(vmJarUplaodDirectory + extractedFileName);
+        user.setJarFilePath(vmJarUplaodDirectory + user.getOriginalFileName());
 
         // Save user data to the database
         jarRepo.save(user);
-        logger.info("User data saved to the database for filePath: {}", filePath);
+        logger.info("User data saved to the database for filePath: {}", user.getBucketFilePath());
 
-        logger.info("finalizeUpload completed successfully for filePath: {}", filePath);
+        logger.info("finalizeUpload completed successfully for filePath: {}", user.getBucketFilePath());
     }
 
     @Override

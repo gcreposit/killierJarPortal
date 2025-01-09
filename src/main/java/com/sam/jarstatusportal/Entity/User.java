@@ -38,6 +38,7 @@ public class User {
     private String pidId;
 
     private String originalFileName;
+    private String bucketFilePath;
 
 
 

@@ -24,7 +24,7 @@ public interface JarService {
 
     String generateSignedUrl(User user, String fileName) throws IOException;
 
-    void finalizeUpload(String filePath) throws IOException, JSchException;
+    void finalizeUpload(User user) throws IOException, JSchException;
 
     Storage getInitializeStorage() throws IOException;
 }

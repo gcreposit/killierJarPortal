@@ -101,10 +101,10 @@ public class DataController {
 
     // Finalize the upload process
     @PostMapping("/finalizeUpload")
-    public ResponseEntity<String> finalizeUpload(@RequestBody Map<String, String> payload) throws IOException, JSchException {
-        String filePath = payload.get("filePath");
+    public ResponseEntity<String> finalizeUpload(@RequestBody User user) throws IOException, JSchException {
 
-        jarService.finalizeUpload(filePath);
+
+        jarService.finalizeUpload(user);
         return ResponseEntity.ok("File uploaded and processed successfully.");
     }
 
