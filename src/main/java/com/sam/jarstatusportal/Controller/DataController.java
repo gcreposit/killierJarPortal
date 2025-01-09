@@ -1,7 +1,6 @@
 package com.sam.jarstatusportal.Controller;
 
 
-import com.google.cloud.storage.Storage;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -18,12 +17,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +52,7 @@ public class DataController {
     private static final String VM_USERNAME = "Administrator";
     private static final String VM_PASSWORD = "Pass1197Pass";
 
-//------------------------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------------------------
 //@RequestParam("jarFile") MultipartFile jarFile
     // Generate signed URL for the file upload
     @PostMapping("/generateSignedUrl")
@@ -71,7 +66,7 @@ public class DataController {
             @RequestParam("month") String month,
             @RequestParam("time") String time,
             @RequestParam("jarFileName") String fileName
-           ) throws IOException {
+    ) throws IOException {
 
         // Create a user object with the extracted data
         User user = new User();
@@ -93,7 +88,7 @@ public class DataController {
         Map<String, String> response = new HashMap<>();
         response.put("signedUrl", signedUrl);
 //        String customUrl="https://storage.cloud.google.com/gpdm_bucket/uploaded-jars/";
-        String customUrl="uploaded-jars/";
+        String customUrl = "uploaded-jars/";
         response.put("filePath", customUrl + fileName); // Include file path
         return ResponseEntity.ok(response);
     }
@@ -270,13 +265,6 @@ public class DataController {
     }
 
 
-    //    This is the end point where I start the backup
-    @PostMapping("/startBackup")
-    public ResponseEntity<String> startBackup(@RequestParam String projectName) {
-        String response = gdriveService.startBackup(projectName);
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/downloadBackup")
     public ResponseEntity<InputStreamResource> downloadBackup(@RequestParam String projectName,
                                                               @RequestParam String fileType) {
@@ -286,11 +274,14 @@ public class DataController {
 
             // Step 2
             java.io.File downloadedFile = gdriveService.downloadFile(fileId);
-
+            String fileName = downloadedFile.getName();
+            if (!fileName.endsWith(".zip") && !fileName.endsWith(".sql")) {
+                fileName += fileType.equals("zip") ? ".zip" : ".sql";
+            }
             // Step 3
             InputStreamResource resource = new InputStreamResource(new FileInputStream(downloadedFile));
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + downloadedFile.getName())
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
                     .header(HttpHeaders.CONTENT_TYPE, fileType.equals("zip") ? "application/zip" : "application/sql")
                     .contentLength(downloadedFile.length())
                     .body(resource);
@@ -343,7 +334,6 @@ public class DataController {
             return "Error generating access token: " + e.getMessage();
         }
     }
-
 
 
 }

@@ -239,61 +239,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-<script>
-    $(document).ready(function () {
-        var table = $("#productionTable").DataTable({
-            dom:
-                '<"top row px-3 py-1 border border-2 border-grey bg-gradient-primary "' +
-                // '   <"col-lg-2 col-md-2 col-sm-12 p-1 d-flex align-items-center"l>' +
-                '   <"col-lg-6 col-md-6 col-sm-12 p-1 d-flex align-items-center"B>' +
-                '   <"col-lg-6 col-md-6 col-sm-12 p-1 d-flex align-items-center"f>' +
-                '   <"clear">>rt' +
-                '<"bottom row px-5"' +
-                '  <"col-lg-6 col-md-6 col-sm-12"i>' +
-                '  <"col-lg-6 col-md-6 col-sm-12"p>' +
-                '   <"clear">>',
-            paging: false,
-            scrollX: true,
 
-            lengthChange: false,
-            buttons: ["copy", "excel", "pdf", "print"],
-            initComplete: function () {
-                $(".dt-buttons button").removeClass("btn-light");
-                $(".dt-buttons button").addClass("m-0 btn-sm btn-outline-dark");
-                $(".dataTables_filter").addClass("w-100 text-center d-flex");
-                $(".dataTables_filter input").addClass("w-75 border-2 border-info ");
-                $(".dataTables_filter label").addClass(
-                    "w-100 text-center align-items-center justify-content-around d-flex m-0 text-dark font-weight-bold"
-                );
-                $(".dt-buttons.btn-group").css("width", "-webkit-fill-available");
 
-            },
-        });
-
-        table
-            .buttons()
-            .container()
-            .appendTo("#productionTable_wrapper .col-md-6:eq(0)");
-    });
-</script>
-
-<script>
-    function parallax_height() {
-        var scroll_top = $(this).scrollTop();
-        var sample_section_top = $(".sample-section").offset().top;
-        var header_height = $(".sample-header-section").outerHeight();
-        $(".sample-section").css({"margin-top": header_height});
-        $(".sample-header").css({height: header_height - scroll_top});
-    }
-
-    parallax_height();
-    $(window).scroll(function () {
-        parallax_height();
-    });
-    $(window).resize(function () {
-        parallax_height();
-    });
-</script>
 
 <!---------------------------Script For SQL Backup Started----------------------->
 <script>
@@ -323,9 +270,55 @@
             return;
         }
 
+
+        let apiUrl;
+        switch (selectedProject) {
+            case "Jalshakti":
+                apiUrl = "https://jalshakti.iwrdup.com/Jalshakti/backup";
+                break;
+            case "JalNoc":
+                apiUrl = "http://localhost:5050/JalNoc/backup";
+                break;
+            case "Monitoring":
+                apiUrl = "http://localhost:5050/Monitoring/backup";
+                break;
+            case "OrganizationSys":
+                apiUrl = "http://localhost:5050/OrganizationSys/backup";
+                break;
+            case "Lms":
+                apiUrl = "http://localhost:5050/Lms/backup";
+                break;
+            case "Dms":
+                apiUrl = "http://localhost:5050/Dms/backup";
+                break;
+            default:
+                alert("Invalid project selected");
+                return;
+        }
+
         // Add API call logic here
         // Call the backend API  (Successfully Completed)
-        fetch(`/data/startBackup?projectName=${selectedProject}`, {
+        // fetch(`/data/startBackup?projectName=${selectedProject}`, {
+        //     method: "POST",
+        // })
+        //     .then((response) => {
+        //         if (!response.ok) {
+        //             throw new Error("Failed to start backup");
+        //         }
+        //         return response.text();
+        //     })
+        //     .then((data) => {
+        //         alert(`Backup started successfully: ${data}`);
+        //     })
+        //     .catch((error) => {
+        //         console.error(error);
+        //         alert("Error starting backup. Please try again.");
+        //     });
+
+
+
+        // Call the backend API
+        fetch(apiUrl, {
             method: "POST",
         })
             .then((response) => {
@@ -340,8 +333,7 @@
             .catch((error) => {
                 console.error(error);
                 alert("Error starting backup. Please try again.");
-            });
-
+            })
     });
 
     // -----------------------------------------------------------------------Handle Download Confirmation Modal-----------------------------------------------------------------------
@@ -386,7 +378,7 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `${selectedProject}_backup${fileType}`;
+                a.download = `${selectedProject}_backup.${fileType}`;
                 document.body.appendChild(a);
                 a.click();
                 a.remove();

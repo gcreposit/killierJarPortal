@@ -14,13 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.Comparator;
 import java.util.List;
@@ -115,9 +114,21 @@ public class GdriveServiceImpl implements GdriveService {
         File fileMetadata = driveService.files().get(fileId).setFields("name").execute();
         String fileName = fileMetadata.getName();
 
+
+// Check and append the correct extension if missing
+        if (!fileName.endsWith(".zip") && !fileName.endsWith(".sql")) {
+            // Determine the correct extension based on content type or context
+            String fileType = fileMetadata.getMimeType(); // Example: Use MIME type if available
+            if (fileType.equals("application/zip")) {
+                fileName += ".zip";
+            } else if (fileType.equals("application/sql")) {
+                fileName += ".sql";
+            } else {
+                throw new IOException("Unknown file type: " + fileType);
+            }
+        }
         // Temporary download location
         java.io.File outputFile = new java.io.File(System.getProperty("java.io.tmpdir") + "/" + fileName);
-
         // Download the file content
         try (var outputStream = new FileOutputStream(outputFile)) {
             driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
@@ -129,37 +140,4 @@ public class GdriveServiceImpl implements GdriveService {
     }
 
 
-    @Override
-    public String startBackup(String projectName) {
-
-        String apiUrl;
-        RestTemplate restTemplate = new RestTemplate();
-        switch (projectName) {
-            case "Jalshakti" -> {
-                apiUrl = "http://localhost:7070/Jalshakti/backup";
-            }
-            case "JalNoc" -> {
-                apiUrl = "http://localhost:5050/JalNoc/backup";
-            }
-            case "Monitoring" -> {
-                apiUrl = "http://localhost:5050/Monitoring/backup";
-            }
-            case "OrganizationSys" -> {
-                apiUrl = "http://localhost:5050/OrganizationSys/backup";
-            }
-            case "Lms" -> {
-                apiUrl = "http://localhost:5050/Lms/backup";
-            }
-            case "Dms" -> {
-                apiUrl = "http://localhost:5050/Dms/backup";
-            }
-            default -> throw new IllegalArgumentException("Invalid project name: " + projectName);
-        }
-        try {
-            ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, null, String.class);
-            return response.getBody();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to start backup for project: " + projectName, e);
-        }
-    }
 }

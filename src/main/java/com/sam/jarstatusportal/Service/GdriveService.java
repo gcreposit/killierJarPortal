@@ -9,7 +9,7 @@ import java.io.IOException;
 public interface GdriveService {
 
 
-    String startBackup(String projectName);
+
 
     String findLatestFile(String projectName, String fileType) throws IOException;
 
