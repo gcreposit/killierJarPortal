@@ -169,7 +169,9 @@
                 <option value="Jalshakti">Jalshakti</option>
                 <option value="JalNoc">JalNoc</option>
                 <option value="Monitoring">Monitoring</option>
-                <option value="OrganizationSys">OrganizationSys</option>
+                <option value="Soochna">UPID Soochna</option>
+                <option value="Pragati">Pragati Portal</option>
+                <option value="IWRDUP">Irrigation Water Resource Portal</option>
             </select>
         </div>
 
@@ -270,7 +272,10 @@
             return;
         }
 
-
+        <option value="Monitoring">Monitoring</option>
+        <option value="Soochna">UPID Soochna</option>
+        <option value="Pragati">Pragati Portal</option>
+        <option value="IWRDUP">Irrigation Water Resource Portal</option>
         let apiUrl;
         switch (selectedProject) {
             case "Jalshakti":
@@ -280,16 +285,19 @@
                 apiUrl = "http://localhost:5050/JalNoc/backup";
                 break;
             case "Monitoring":
-                apiUrl = "http://localhost:5050/Monitoring/backup";
-                break;
-            case "OrganizationSys":
-                apiUrl = "http://localhost:5050/OrganizationSys/backup";
+                apiUrl = "https://monitor.iwrdup.com/Monitoring/backup";
                 break;
             case "Lms":
                 apiUrl = "http://localhost:5050/Lms/backup";
                 break;
             case "Dms":
                 apiUrl = "http://localhost:5050/Dms/backup";
+                break;
+            case "Soochna":
+                apiUrl = "https://admin.upidgov.in/soochna/backup";
+                break;
+            case "IWRDUP":
+                apiUrl = "https://water.iwrdup.com/IWRDUP/backup";
                 break;
             default:
                 alert("Invalid project selected");
@@ -314,7 +322,6 @@
         //         console.error(error);
         //         alert("Error starting backup. Please try again.");
         //     });
-
 
 
         // Call the backend API
