@@ -18,8 +18,6 @@ public class LogWebSocketHandler extends TextWebSocketHandler {
     private static final ConcurrentHashMap<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
 
 
-
-
     @Autowired
     private StringRedisTemplate redisTemplate;
 
