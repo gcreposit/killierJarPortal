@@ -434,9 +434,19 @@
         const consoleId = `console-${paneId}`;
 
         // Avoid duplicate sessions
+        // if (!activeSessions.includes(sessionId)) {
+        //     activeSessions.push(sessionId);
+        //     sessionStorage.setItem('activeSessions', JSON.stringify(activeSessions));
+        // }
+        // Avoid duplicate sessions
         if (!activeSessions.includes(sessionId)) {
             activeSessions.push(sessionId);
             sessionStorage.setItem('activeSessions', JSON.stringify(activeSessions));
+            // Persist session in Redis
+            fetch(`/data/saveSession?sessionId=${sessionId}`, { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log("Session saved in Redis:", data))
+                .catch(error => console.error("Error saving session in Redis:", error));
         }
 
         tabCounter++;
@@ -476,34 +486,72 @@
     }
 
     // Function to Reload Sessions on Page Refresh
+    // window.onload = function reloadSessions() {
+    //     debugger;
+    //     const savedSessions = JSON.parse(sessionStorage.getItem('activeSessions')) || [];
+    //     savedSessions.forEach(sessionId => {
+    //         const tabId = `tab-${tabCounter}`;
+    //         const paneId = `pane-${tabCounter}`;
+    //         const consoleId = `console-${paneId}`;
+    //         tabCounter++;
+    //
+    //         // Recreate CMD Tab
+    //         createCMDTab(tabId, paneId, consoleId, sessionId);
+    //
+    //         // Fetch persisted logs
+    //         fetch(`/data/fetchLogs?sessionId=${sessionId}`)
+    //             .then(response => response.json())
+    //             .then(logs => {
+    //                 const consoleDiv = document.getElementById(consoleId);
+    //                 logs.forEach(log => {
+    //                     consoleDiv.innerHTML += log + '<br>';
+    //                 });
+    //                 consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll
+    //             })
+    //             .catch(error => console.error("Error fetching logs:", error));
+    //
+    //         // krliya  bc persistent logic complete Reconnect WebSocket mast logic h ye :)❣️
+    //         justToReconnectWebsocket(sessionId, consoleId);
+    //     });
+    // };
+
+    // This is new Approach lets see this approach and work on this
     window.onload = function reloadSessions() {
         debugger;
-        const savedSessions = JSON.parse(sessionStorage.getItem('activeSessions')) || [];
-        savedSessions.forEach(sessionId => {
-            const tabId = `tab-${tabCounter}`;
-            const paneId = `pane-${tabCounter}`;
-            const consoleId = `console-${paneId}`;
-            tabCounter++;
 
-            // Recreate CMD Tab
-            createCMDTab(tabId, paneId, consoleId, sessionId);
+        // Fetch active sessions from Redis
+        fetch('/data/fetchActiveSessions')
+            .then(response => response.json())
+            .then(savedSessions => {
+                savedSessions.forEach(sessionId => {
+                    const tabId = `tab-${tabCounter}`;
+                    const paneId = `pane-${tabCounter}`;
+                    const consoleId = `console-${paneId}`;
+                    tabCounter++;
 
-            // Fetch persisted logs
-            fetch(`/data/fetchLogs?sessionId=${sessionId}`)
-                .then(response => response.json())
-                .then(logs => {
-                    const consoleDiv = document.getElementById(consoleId);
-                    logs.forEach(log => {
-                        consoleDiv.innerHTML += log + '<br>';
-                    });
-                    consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll
-                })
-                .catch(error => console.error("Error fetching logs:", error));
+                    // Recreate CMD Tab
+                    createCMDTab(tabId, paneId, consoleId, sessionId);
 
-            // krliya  bc persistent logic complete Reconnect WebSocket mast logic h ye :)❣️
-            justToReconnectWebsocket(sessionId, consoleId);
-        });
+                    // Fetch persisted logs
+                    fetch(`/data/fetchLogs?sessionId=${sessionId}`)
+                        .then(response => response.json())
+                        .then(logs => {
+                            const consoleDiv = document.getElementById(consoleId);
+                            logs.forEach(log => {
+                                consoleDiv.innerHTML += log + '<br>';
+                            });
+                            consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll
+                        })
+                        .catch(error => console.error("Error fetching logs:", error));
+
+                    // Reconnect WebSocket for live updates
+                    justToReconnectWebsocket(sessionId, consoleId);
+                });
+            })
+            .catch(error => console.error('Error fetching active sessions:', error));
     };
+
+
 
     function justToReconnectWebsocket(sessionId, consoleId) {
         const consoleDiv = document.getElementById(consoleId);
@@ -590,6 +638,11 @@
         // Remove sessionId from activeSessions
         activeSessions = activeSessions.filter(s => s !== sessionId);
         sessionStorage.setItem('activeSessions', JSON.stringify(activeSessions));
+        // Remove sessionId from Redis ❣️
+        fetch(`/data/removeSession?sessionId=${sessionId}`, { method: 'DELETE' })
+            .then(response => response.text())
+            .then(data => console.log("Session removed from Redis:", data))
+            .catch(error => console.error("Error removing session from Redis:", error));
     }
 
     // Function to Kill JAR

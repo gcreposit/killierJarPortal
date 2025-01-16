@@ -114,6 +114,7 @@ public class DataController {
     @Autowired
     private ZeroSsLService zeroSSLService;
 
+    //    Ye logs dkhne ke liye
     @GetMapping("/fetchLogs")
     public List<String> fetchLogs(@RequestParam("sessionId") String sessionId) {
 
@@ -335,5 +336,32 @@ public class DataController {
         }
     }
 
+    //Saving Session in Redis using persistence Logic
+    @PostMapping("/saveSession")
+    public ResponseEntity<String> saveSession(@RequestParam String sessionId) {
+        redisTemplate.opsForList().rightPush("activeSessions", sessionId); // Add sessionId to Redis
+        return ResponseEntity.ok("Session saved successfully.");
+    }
+
+    //Getting those  Session from  Redis to load the active session Id
+    @GetMapping("/fetchActiveSessions")
+    public ResponseEntity<List<String>> fetchActiveSessions() {
+        List<String> activeSessions = redisTemplate.opsForList().range("activeSessions", 0, -1);
+        return ResponseEntity.ok(activeSessions); // Return all active session IDs
+    }
+
+    //Deleting the session from Redis if cross button is clicked (So it deletes the activie session  and it removes the log key)
+    @DeleteMapping("/removeSession")
+    public ResponseEntity<String> removeSession(@RequestParam String sessionId) {
+        redisTemplate.opsForList().remove("activeSessions", 1, sessionId); // Remove sessionId from Redis
+
+        // Delete the logs associated with this session
+        String redisKey = "logs:" + sessionId;
+        Boolean isLogKeyDeleted = redisTemplate.delete(redisKey);
+
+        String message = "Session " + sessionId + " removed from activeSessions. ";
+        message += (isLogKeyDeleted != null && isLogKeyDeleted) ? "Logs deleted successfully." : "No logs found to delete.";
+        return ResponseEntity.ok(message);
+    }
 
 }
