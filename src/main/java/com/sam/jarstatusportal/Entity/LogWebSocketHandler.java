@@ -1,7 +1,6 @@
 package com.sam.jarstatusportal.Entity;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -34,6 +33,7 @@ public class LogWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, org.springframework.web.socket.CloseStatus status) {
         sessionMap.values().remove(session);
+
         System.out.println("WebSocket Connection Closed: " + session.getId());
     }
 
@@ -48,15 +48,12 @@ public class LogWebSocketHandler extends TextWebSocketHandler {
                 redisTemplate.opsForList().rightPush(redisKey, logMessage);
 
                 // Print confirmation of saving to Redis
-                System.out.println("Log saved to Redis: " + logMessage);
+//                System.out.println("Log saved to Redis: " + logMessage);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-
-
-
 
 
 }

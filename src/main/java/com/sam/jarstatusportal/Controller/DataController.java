@@ -122,8 +122,8 @@ public class DataController {
         List<String> logs = redisTemplate.opsForList().range(redisKey, 0, -1);
 
         // abeyy dkh ja bhai logs
-        System.out.println("Logs retrieved from Redis for sessionId " + sessionId + ":");
-        logs.forEach(System.out::println);
+//        System.out.println("Logs retrieved from Redis for sessionId " + sessionId + ":");
+//        logs.forEach(System.out::println);
 
         return logs; // Return logs to the client
     }
@@ -157,7 +157,7 @@ public class DataController {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        logWebSocketHandler.sendLogToClient(sessionId, "STDOUT: " + line);
+                        logWebSocketHandler.sendLogToClient(sessionId,  line);
                         // Storing  PID dynamically Logic Implemented By SamCr7 using regex
                         if (line.contains("with PID")) {
                             String pid = extractPidFromLine(line);
@@ -340,6 +340,7 @@ public class DataController {
     @PostMapping("/saveSession")
     public ResponseEntity<String> saveSession(@RequestParam String sessionId) {
         redisTemplate.opsForList().rightPush("activeSessions", sessionId); // Add sessionId to Redis
+
         return ResponseEntity.ok("Session saved successfully.");
     }
 

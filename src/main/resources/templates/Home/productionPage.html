@@ -346,6 +346,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/reconnecting-websocket/dist/reconnecting-websocket.min.js"></script>
+
 <script>
     $(document).ready(function () {
         var table = $("#productionTable").DataTable({
@@ -488,8 +491,8 @@
 
     // 😎 This is new Approach lets see this approach and work on this (It worked!😎)
     window.onload = function reloadSessions() {
-        debugger;
 
+        debugger;
         // Fetch active sessions from Redis
         fetch('/data/fetchActiveSessions')
             .then(response => response.json())
@@ -526,9 +529,22 @@
     function justToReconnectWebsocket(sessionId, consoleId) {
         debugger;
         const consoleDiv = document.getElementById(consoleId);
-        // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
-        const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
-        console.log("reconnecting link ", socket)
+        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        // const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
+        // console.log("reconnecting link ", socket)
+
+
+        // const wsUrl = `ws://localhost:5050/ws/logs?sessionId=${sessionId}`;
+        // const socket = new ReconnectingWebSocket(wsUrl, null, {
+        //     debug: true,
+        //     reconnectInterval: 3000,
+        //     maxReconnectInterval: 30000,
+        //     reconnectDecay: 1.5,
+        //     timeoutInterval: 5000,
+        //     maxReconnectAttempts: null
+        // });
+
+
 
 
         socket.onopen = () => {
@@ -559,8 +575,27 @@
         console.log("redis SessionId", sessionId)
         console.log("redis consoleId", consoleId)
         const consoleDiv = document.getElementById(consoleId);
-        // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
-        const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
+        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        // const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
+
+
+        // New Logic Of websocket Connection----
+        // WebSocket URL
+        // const wsUrl = `wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`;
+        //
+        // // Use ReconnectingWebSocket
+        // const socket = new ReconnectingWebSocket(wsUrl, null, {
+        //     debug: true, // Enable debug logs for development
+        //     reconnectInterval: 3000, // Retry every 3 seconds
+        //     maxReconnectInterval: 30000, // Max delay between retries
+        //     reconnectDecay: 1.5, // Increase delay by 1.5x on each retry
+        //     timeoutInterval: 5000, // Time to wait before assuming the connection has failed
+        //     maxReconnectAttempts: null // Retry indefinitely
+        // });
+
+
+
+
 
         console.log("setup websocket link ", socket)
         socket.onopen = () => {
