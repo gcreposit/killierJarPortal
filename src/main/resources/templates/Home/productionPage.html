@@ -443,7 +443,7 @@
             activeSessions.push(sessionId);
             sessionStorage.setItem('activeSessions', JSON.stringify(activeSessions));
             // Persist session in Redis
-            fetch(`/data/saveSession?sessionId=${sessionId}`, { method: 'POST' })
+            fetch(`/data/saveSession?sessionId=${sessionId}`, {method: 'POST'})
                 .then(response => response.text())
                 .then(data => console.log("Session saved in Redis:", data))
                 .catch(error => console.error("Error saving session in Redis:", error));
@@ -485,37 +485,8 @@
         document.getElementById(tabId).click();
     }
 
-    // Function to Reload Sessions on Page Refresh
-    // window.onload = function reloadSessions() {
-    //     debugger;
-    //     const savedSessions = JSON.parse(sessionStorage.getItem('activeSessions')) || [];
-    //     savedSessions.forEach(sessionId => {
-    //         const tabId = `tab-${tabCounter}`;
-    //         const paneId = `pane-${tabCounter}`;
-    //         const consoleId = `console-${paneId}`;
-    //         tabCounter++;
-    //
-    //         // Recreate CMD Tab
-    //         createCMDTab(tabId, paneId, consoleId, sessionId);
-    //
-    //         // Fetch persisted logs
-    //         fetch(`/data/fetchLogs?sessionId=${sessionId}`)
-    //             .then(response => response.json())
-    //             .then(logs => {
-    //                 const consoleDiv = document.getElementById(consoleId);
-    //                 logs.forEach(log => {
-    //                     consoleDiv.innerHTML += log + '<br>';
-    //                 });
-    //                 consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll
-    //             })
-    //             .catch(error => console.error("Error fetching logs:", error));
-    //
-    //         // krliya  bc persistent logic complete Reconnect WebSocket mast logic h ye :)❣️
-    //         justToReconnectWebsocket(sessionId, consoleId);
-    //     });
-    // };
 
-    // This is new Approach lets see this approach and work on this
+    // 😎 This is new Approach lets see this approach and work on this (It worked!😎)
     window.onload = function reloadSessions() {
         debugger;
 
@@ -532,7 +503,7 @@
                     // Recreate CMD Tab
                     createCMDTab(tabId, paneId, consoleId, sessionId);
 
-                    // Fetch persisted logs
+                    // Fetch persisted logs (directly calling it from redis)
                     fetch(`/data/fetchLogs?sessionId=${sessionId}`)
                         .then(response => response.json())
                         .then(logs => {
@@ -544,7 +515,7 @@
                         })
                         .catch(error => console.error("Error fetching logs:", error));
 
-                    // Reconnect WebSocket for live updates
+                    // Reconnect WebSocket for live updates (sabse mast logic h ye ❣️)
                     justToReconnectWebsocket(sessionId, consoleId);
                 });
             })
@@ -552,11 +523,13 @@
     };
 
 
-
     function justToReconnectWebsocket(sessionId, consoleId) {
+        debugger;
         const consoleDiv = document.getElementById(consoleId);
-        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
-        // const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
+        // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
+        console.log("reconnecting link ", socket)
+
 
         socket.onopen = () => {
             consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
@@ -586,10 +559,10 @@
         console.log("redis SessionId", sessionId)
         console.log("redis consoleId", consoleId)
         const consoleDiv = document.getElementById(consoleId);
-        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
-        // const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
+        // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
 
-
+        console.log("setup websocket link ", socket)
         socket.onopen = () => {
             consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
         };
@@ -635,11 +608,11 @@
             console.log("WebSocket Closed for Session:", sessionId);
         }
 
-        // Remove sessionId from activeSessions
+        // Remove sessionId from activeSessions (this session logic was pre build so it been optimized if you want to remove this session part you can !)
         activeSessions = activeSessions.filter(s => s !== sessionId);
         sessionStorage.setItem('activeSessions', JSON.stringify(activeSessions));
         // Remove sessionId from Redis ❣️
-        fetch(`/data/removeSession?sessionId=${sessionId}`, { method: 'DELETE' })
+        fetch(`/data/removeSession?sessionId=${sessionId}`, {method: 'DELETE'})
             .then(response => response.text())
             .then(data => console.log("Session removed from Redis:", data))
             .catch(error => console.error("Error removing session from Redis:", error));

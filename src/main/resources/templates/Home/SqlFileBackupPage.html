@@ -135,6 +135,7 @@
         text-align: center;
     }
 </style>
+
 <body>
 
 <header class="header m-1">
@@ -243,9 +244,9 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
 
-
 <!---------------------------Script For SQL Backup Started----------------------->
 <script>
+
     const projectDropdown = document.getElementById("project-dropdown");
     const actionButtons = document.getElementById("action-buttons");
     const confirmationModal = new bootstrap.Modal(document.getElementById("confirmationModal"));
@@ -255,6 +256,7 @@
 
     // Show buttons when a project is selected
     projectDropdown.addEventListener("change", () => {
+        debugger;
         const selectedProject = projectDropdown.value;
         if (selectedProject) {
             actionButtons.style.display = "flex";
@@ -272,10 +274,6 @@
             return;
         }
 
-        <option value="Monitoring">Monitoring</option>
-        <option value="Soochna">UPID Soochna</option>
-        <option value="Pragati">Pragati Portal</option>
-        <option value="IWRDUP">Irrigation Water Resource Portal</option>
         let apiUrl;
         switch (selectedProject) {
             case "Jalshakti":
