@@ -569,7 +569,8 @@
         };
 
         socket.onclose = () => {
-            consoleDiv.innerHTML += '<span style="color: orange">WebSocket Connection Closed</span><br>';
+            consoleDiv.innerHTML += '<span style="color: orange">WebSocket Connection Closed. Retrying...</span><br>';
+            setTimeout(() => justToReconnectWebsocket(sessionId, consoleId), 5000); // Retry after 5 seconds
         };
 
         consoleDiv.socket = socket; // Attach socket for cleanup

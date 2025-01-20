@@ -39,6 +39,7 @@ public class LogWebSocketHandler extends TextWebSocketHandler {
         String sessionId = session.getUri().getQuery().split("=")[1];
         sessionMap.put(sessionId, session);
         lastPongReceived.put(sessionId, Instant.now()); // Initialize with the current timestamp
+        redisTemplate.opsForHash().put("sessionStatus", sessionId, "UP");
         logger.info("WebSocket Connection Established for sessionId: {}", sessionId);
 
     }
@@ -116,12 +117,33 @@ public class LogWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handlePongMessage(WebSocketSession session, PongMessage message) {
         String sessionId = session.getUri().getQuery().split("=")[1];
-
-        logger.info("Pong received from sessionId: {}", sessionId);
+        // Update last pong received time
+        lastPongReceived.put(sessionId, Instant.now());
 
         // Mark the session as UP in Redis
         redisTemplate.opsForHash().put("sessionStatus", sessionId, "UP");
+        logger.info("Pong received from sessionId: {}", sessionId);
 
+    }
+
+    @Scheduled(fixedRate = 30000) // Check every 30 seconds
+    public void checkStaleConnections() {
+        Instant now = Instant.now();
+
+        sessionMap.forEach((sessionId, session) -> {
+            Instant lastPong = lastPongReceived.getOrDefault(sessionId, Instant.EPOCH);
+
+            if (lastPong.isBefore(now.minusSeconds(60))) { // No pong in the last 60 seconds
+                logger.warn("Stale connection detected for sessionId: {}", sessionId);
+                try {
+                    session.close(CloseStatus.SESSION_NOT_RELIABLE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                sessionMap.remove(sessionId);
+                redisTemplate.opsForHash().put("sessionStatus", sessionId, "DOWN");
+            }
+        });
     }
 
 
