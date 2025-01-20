@@ -341,6 +341,7 @@ public class DataController {
     public ResponseEntity<String> saveSession(@RequestParam String sessionId) {
         redisTemplate.opsForList().rightPush("activeSessions", sessionId); // Add sessionId to Redis
 
+        redisTemplate.opsForHash().put("sessionStatus", sessionId, "UP"); // Set session status to UP
         return ResponseEntity.ok("Session saved successfully.");
     }
 
@@ -364,5 +365,8 @@ public class DataController {
         message += (isLogKeyDeleted != null && isLogKeyDeleted) ? "Logs deleted successfully." : "No logs found to delete.";
         return ResponseEntity.ok(message);
     }
+
+
+
 
 }

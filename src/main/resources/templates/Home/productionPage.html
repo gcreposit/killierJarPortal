@@ -349,6 +349,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/reconnecting-websocket/dist/reconnecting-websocket.min.js"></script>
 
+<script src="/static/reconnecting-websocket.js"></script>
+
 <script>
     $(document).ready(function () {
         var table = $("#productionTable").DataTable({
@@ -529,9 +531,10 @@
     function justToReconnectWebsocket(sessionId, consoleId) {
         debugger;
         const consoleDiv = document.getElementById(consoleId);
-        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
-        // const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
+        // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
         // console.log("reconnecting link ", socket)
+
 
 
         // const wsUrl = `ws://localhost:5050/ws/logs?sessionId=${sessionId}`;
@@ -545,16 +548,20 @@
         // });
 
 
-
-
         socket.onopen = () => {
             consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
         };
 
         socket.onmessage = (event) => {
             console.log(event.data)
-            consoleDiv.innerHTML += event.data + '<br>';
-            consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll to the bottom
+            if (event.data === "ping") {
+                socket.send("pong");
+                console.log("Pong sent in response to ping.");
+            }else{
+                consoleDiv.innerHTML += event.data + '<br>';
+                consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll to the bottom
+            }
+
         };
 
         socket.onerror = () => {
@@ -575,8 +582,8 @@
         console.log("redis SessionId", sessionId)
         console.log("redis consoleId", consoleId)
         const consoleDiv = document.getElementById(consoleId);
-        const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
-        // const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
+        // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
+        const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
 
 
         // New Logic Of websocket Connection----
@@ -594,15 +601,20 @@
         // });
 
 
-
-
-
         console.log("setup websocket link ", socket)
         socket.onopen = () => {
             consoleDiv.innerHTML += '<span style="color: lime">WebSocket Connection Established</span><br>';
         };
 
         socket.onmessage = (event) => {
+            const message = event.data;
+            if (event.data === "ping") {
+                socket.send("pong");
+                console.log("Pong sent in response to ping.");
+            } else {
+                console.log("Message received:", event.data);
+            }
+
             console.log(event.data)
             consoleDiv.innerHTML += event.data + '<br>';
             consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll to the bottom
@@ -667,7 +679,7 @@
             });
     }
 
-
+    // It's not been functional yet
     function checkStatus(port, buttonElement) {
         fetch(`http://localhost:${port}/actuator/health`)
             .then(response => response.json())
