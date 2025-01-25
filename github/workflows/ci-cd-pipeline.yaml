@@ -1,4 +1,4 @@
-name: JarStatusPortal CI/CD
+name: JarStatusPortal
 
 on:
   push:
