@@ -367,6 +367,16 @@ public class DataController {
     }
 
 
+    //Getting those  Session from  Redis to load the active session Id
+    // API endpoint to fetch a domain's all  subdomains
+    @PostMapping("/subdomain/{domainName}")
+    public ResponseEntity<Domain> getDomainWithSubdomains(@PathVariable String domainName) {
+        Domain domain = goDaddyService.getDomainWithSubdomains(domainName);
+//        logger.info("domain",domain)
+        return ResponseEntity.ok(domain);
+    }
+
+
 
 
 }

@@ -8,6 +8,13 @@
     <link href="/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet"/>
     <link href="/assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet"/>
     <link href="/assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet"/>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- loader-->
     <!--    <link href="/assets/css/pace.min.css" rel="stylesheet"/>-->
     <!--    <script src="/assets/js/pace.min.js"></script>-->
@@ -210,6 +217,7 @@
                 <th>Generate CSR</th>
                 <th>Verify Domain</th>
                 <th>Download Crt</th>
+                <th>Get SubDomain</th>
             </tr>
             </thead>
             <tbody id="domain-list"></tbody>
@@ -219,6 +227,40 @@
     <!-------------------------------------Go Daddy DNS Manager Ended ---------------------------------------------------------->
 
 </div>
+<!-- ----------------------------Started Modal for Subdomains------------------------>
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Subdomains List</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Subdomain</th>
+                        <th>Generate CSR</th>
+                        <th>Verify Domain</th>
+                        <th>Download Certificate</th>
+                    </tr>
+                    </thead>
+                    <tbody id="subdomainTableBody">
+                    <!-- Subdomain rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ----------------------------Ended Modal for Subdomains------------------------>
+
+
+
 
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -335,6 +377,9 @@
              <td>
                 <button class="btn btn-warning" onclick="downlaodZeroSslCertificate('${domain.domain}')">Download Certificate</button>
             </td>
+             <td>
+                <button class="btn btn-primary" onclick="openModalToGetSubDomains('${domain.domain}')">Get SubDomain</button>
+            </td>
         </tr>
     `).join('');
         };
@@ -382,7 +427,7 @@
             });
 
             if (response.ok) {
-                const result = await response.json();
+                const result = await response.text();
                 console.log('CSR Generated:', result);
                 alert(`CSR generated for domain: ${domain}\n\nCSR:\n${result.csr}`);
             } else {
@@ -406,7 +451,7 @@
             });
 
             if (response.ok) {
-                const result = await response.json();
+                const result = await response.text();
                 console.log('CSR Generated:', result);
                 alert(`CSR generated for domain: ${domain}\n\nCSR:\n${result.csr}`);
             } else {
@@ -421,6 +466,54 @@
     // Function to Downlaod Zero Ssl Certificate   Ended ----------------
 
 
+    // Function to Get Subdomain Started ----------------
+    // Function to Fetch Subdomains and Open Modal
+    const openModalToGetSubDomains = (domain) => {
+        fetch(`/data/subdomain/${domain}`, { method: 'POST' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch subdomains: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Raw JSON Response:", data);
+
+                const subdomains = data.subdomains || []; // Extract subdomains
+
+                renderSubdomainTable(subdomains, domain);
+
+                // Open Bootstrap Modal
+                const modalElement = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+                modalElement.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while fetching subdomains.');
+            });
+    };
+
+    // Function to Render Subdomains in the Modal's Table
+    const renderSubdomainTable = (subdomains, domain) => {
+        const subdomainTable = document.getElementById('subdomainTableBody');
+
+        if (subdomainTable) {
+            subdomainTable.innerHTML = subdomains.map(subdomain => `
+            <tr>
+                <td>${subdomain}</td>
+                <td><button class="btn btn-success" onclick="generateCSR('${subdomain}')">Generate CSR</button></td>
+                <td><button class="btn btn-danger" onclick="verifyDomainByZeroSsl('${subdomain}')">Verify Domain</button></td>
+                <td><button class="btn btn-warning" onclick="downlaodZeroSslCertificate('${subdomain}')">Download Certificate</button></td>
+            </tr>
+        `).join('');
+        } else {
+            console.error('Table body not found.');
+        }
+    };
+
+
+
+    // Function to Get Subdomain  Ended ----------------
 </script>
 <!---------------------------Script For SQL Backup Ended----------------------->
 

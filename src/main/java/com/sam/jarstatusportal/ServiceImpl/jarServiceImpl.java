@@ -51,6 +51,8 @@ public class jarServiceImpl implements JarService {
     @Value("${vm.password}")
     private String vmPassword;
 
+
+
     private Map<String, User> temporaryStorage = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(JarService.class);
@@ -322,7 +324,7 @@ public class jarServiceImpl implements JarService {
 //        String extractedFileName = filePath.substring(filePath.lastIndexOf("/") + 1);
         logger.info("Extracted file name: {}", user.getOriginalFileName());
 
-        java.io.File downloadedFile = downloadFromGCS(BUCKET_NAME,  user.getOriginalFileName());
+        java.io.File downloadedFile = downloadFromGCS(BUCKET_NAME, user.getOriginalFileName());
 
 //        User user = getTemporaryUserData(extractedFileName); // Retrieve temporary data
 
@@ -343,7 +345,7 @@ public class jarServiceImpl implements JarService {
     @Override
     public Storage getInitializeStorage() throws IOException {
 
-        Storage getStorage=initializeStorage();
+        Storage getStorage = initializeStorage();
         return getStorage;
     }
 

@@ -117,7 +117,7 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
             logger.info("Generating CSR using OpenSSL...");
 //            ProcessBuilder processBuilder = new ProcessBuilder("C:\\Program Files\\OpenSSL-Win64\\bin\\openssl", "req", "-nodes", "-newkey", "rsa:2048", "-sha256", "-keyout", tempKeyFilePath.toString(), "-out", tempCSRFilePath.toString(), "-subj", "/CN=" + domain, "-config", "C:\\Program Files\\OpenSSL-Win64\\bin\\cnf\\openssl.cnf");
 
-//          New Process Build
+//          New Process Build (Its is for Docker so if you want to test it on local comment out above process builder and make sure you have open ssl isntalled in your pc
             ProcessBuilder processBuilder = new ProcessBuilder(
                     "/usr/bin/openssl",
                     "req", "-nodes", "-newkey", "rsa:2048", "-sha256",

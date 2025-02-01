@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface GoDaddyService {
     List<Domain> getDomains();
+
+    Domain getDomainWithSubdomains(String domainName);
 }

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -30,4 +32,6 @@ public class Domain {
     private String createdAt;       // Domain creation date in ISO format
 
 
+    @Transient  // This field won't be persisted in the database
+    private List<String> subdomains;
 }

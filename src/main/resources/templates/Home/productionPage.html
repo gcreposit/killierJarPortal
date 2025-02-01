@@ -159,15 +159,15 @@
 
     <div class="row text-center justify-content-center">
         <!---------Sql Backup Button------------->
-        <div class="col-xl-6 col-lg-3 col-md-12 col-sm-12 col-12">
+        <div class="col-xl-4 col-lg-3 col-md-12 col-sm-12 col-12">
             <h1 class="mb-4">SQL/File Backup</h1>
             <a th:href="@{/jar/uploadDownlaodForm}" class="btn btn-primary btn-lg">
                 SQL/File Backup
             </a>
         </div>
 
-        <!---------Sql Backup Button------------->
-        <div class="col-xl-6 col-lg-3 col-md-12 col-sm-12 col-12">
+        <!---------Add Backup Button------------->
+        <div class="col-xl-4 col-lg-3 col-md-12 col-sm-12 col-12">
 
             <h1 class="mb-4">Killer Dns Manger</h1>
             <a th:href="@{/jar/goDaddyPage}" class="btn btn-danger btn-lg">
@@ -175,8 +175,16 @@
             </a>
         </div>
 
-    </div>
+        <!---------Add Jar Upload  Button------------->
+        <div class="col-xl-4 col-lg-3 col-md-12 col-sm-12 col-12">
 
+            <h1 class="mb-4">Upload Jar </h1>
+            <a th:href="@{/jar/jarForm}" class="btn btn-warning btn-lg">
+                Upload Jar
+            </a>
+        </div>
+
+    </div>
 
     <div class="table-responsive mt-5">
         <table
@@ -263,6 +271,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-white">
+
                     <form th:action="@{/jar/updateJar}" method="post" novalidate enctype="multipart/form-data">
                         <div class="card">
                             <div class="card-body">
@@ -490,7 +499,6 @@
         document.getElementById(tabId).click();
     }
 
-
     // 😎 This is new Approach lets see this approach and work on this (It worked!😎)
     window.onload = function reloadSessions() {
 
@@ -527,14 +535,12 @@
             .catch(error => console.error('Error fetching active sessions:', error));
     };
 
-
     function justToReconnectWebsocket(sessionId, consoleId) {
         debugger;
         const consoleDiv = document.getElementById(consoleId);
         // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
         const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
         // console.log("reconnecting link ", socket)
-
 
 
         // const wsUrl = `ws://localhost:5050/ws/logs?sessionId=${sessionId}`;
@@ -557,7 +563,7 @@
             if (event.data === "ping") {
                 socket.send("pong");
                 console.log("Pong sent in response to ping.");
-            }else{
+            } else {
                 consoleDiv.innerHTML += event.data + '<br>';
                 consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto-scroll to the bottom
             }
