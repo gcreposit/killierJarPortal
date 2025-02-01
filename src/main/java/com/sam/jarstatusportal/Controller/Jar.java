@@ -21,6 +21,7 @@ public class Jar {
     @Autowired
     private JarService jarService;
 
+    //    It a dashboard UI
     @GetMapping(path = "/dashboard")
     public String fetchCleanGangaDetails(Model theModel) {
 
@@ -59,7 +60,6 @@ public class Jar {
     //Sql/File Backup Page loading function
     @GetMapping(path = "/uploadDownlaodForm")
     public String SqlFileBackupPage(Model theModel) {
-
 
         return "Home/SqlFileBackupPage";
 

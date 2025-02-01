@@ -185,6 +185,7 @@
         </div>
 
     </div>
+    <!-------------------------------------STARTED TABLE AFTER BUTTONS SQL/FILE BACKUP  & KILLER DNS MANGER   & UPLOAD JAR--------------------------------------------->
 
     <div class="table-responsive mt-5">
         <table
@@ -195,7 +196,7 @@
             <thead class="text-center">
             <tr>
                 <th scope="col">Sr.</th>
-                <th scope="col" hidden>Hidden Id</th>
+                <th scope="col" >Hidden Id</th>
                 <th scope="col">JAR</th>
                 <th scope="col">Website</th>
                 <th scope="col">Port</th>
@@ -210,7 +211,7 @@
             <tbody class="text-center">
             <tr th:each="user, x : ${userList}">
                 <td th:text="${x.index + 1}"></td>
-                <td hidden th:text="${user.id}"></td>
+                <td  th:text="${user.id}"></td>
                 <td th:text="${user.jarFilePath}"></td>
                 <td th:text="${user.website}"></td>
                 <td th:text="${user.port}"></td>
@@ -247,6 +248,8 @@
 
     </div>
 
+    <!-------------------------------------ENDED TABLE AFTER BUTTONS SQL/FILE BACKUP  & KILLER DNS MANGER   & UPLOAD JAR--------------------------------------------->
+
     <h1 class="text-center">Real-Time CMD Console</h1>
     <!--    <div id="console"></div>-->
     <div class="container mt-4">
@@ -262,7 +265,8 @@
 <div class="col">
     <!-- Button trigger modal -->
 
-    <!-- Modal -->
+    <!-- -------------------------------------START MODAL TO REPLACE THE JAR-------------------------------------------------------->
+
     <div class="modal fade" id="exampleDarkModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content bg-dark">
@@ -272,7 +276,87 @@
                 </div>
                 <div class="modal-body text-white">
 
-                    <form th:action="@{/jar/updateJar}" method="post" novalidate enctype="multipart/form-data">
+
+                    <form id="uploadFileTobucket">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Jar File:</label>
+                                    <div class="input-group">
+                                        <input type="file" id="jarFileExp" name="jarFile" class="form-control" accept=".jar" required>
+                                        <button type="button" id="uploadButton" class="btn btn-primary">Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+
+<!--                    <form th:action="@{/jar/updateJar}" method="post" novalidate enctype="multipart/form-data">-->
+<!--                        <div class="card">-->
+<!--                            <div class="card-body">-->
+
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">ID</label>-->
+<!--                                    <input type="text" id="id" name="id" class="form-control">-->
+<!--                                </div>-->
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">Jar File:</label>-->
+<!--                                    <input type="file" name="jarFile" class="form-control">-->
+<!--                                </div>-->
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">Uplaoding Developer Name:</label>-->
+<!--                                    <input type="text" id="developerName" name="developerName" class="form-control">-->
+<!--                                </div>-->
+
+
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">Website Name:</label>-->
+<!--                                    <input type="text" id="website" name="website" class="form-control"-->
+<!--                                           placeholder="Website Nam">-->
+<!--                                </div>-->
+
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">Domain Name:</label>-->
+<!--                                    <input type="text" id="domain" name="domain" class="form-control"-->
+<!--                                           placeholder="Domain Name">-->
+<!--                                </div>-->
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">Port:</label>-->
+<!--                                    <input type="text" id="port" name="port" class="form-control" placeholder="Port">-->
+<!--                                </div>-->
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">Url:</label>-->
+<!--                                    <input type="url" id="url" name="url" class="form-control"-->
+<!--                                           placeholder="https://example.com/users/">-->
+<!--                                </div>-->
+
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">Date:</label>-->
+<!--                                    <input type="date" id="date" name="date" class="form-control">-->
+<!--                                </div>-->
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">Month:</label>-->
+<!--                                    <input type="month" id="month" name="month" class="form-control">-->
+<!--                                </div>-->
+
+
+<!--                                <div class="mb-3">-->
+<!--                                    <label class="form-label">Time:</label>-->
+<!--                                    <input type="time" id="time" name="time" class="form-control">-->
+<!--                                </div>-->
+
+
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        <div class="text-center"> &lt;!&ndash; or use d-flex justify-content-center &ndash;&gt;-->
+<!--                            <button type="submit" class="btn btn-primary">Upload</button>-->
+<!--                        </div>-->
+<!--                    </form>-->
+
+                    <form id="updateForm">
                         <div class="card">
                             <div class="card-body">
 
@@ -280,65 +364,74 @@
                                     <label class="form-label">ID</label>
                                     <input type="text" id="id" name="id" class="form-control">
                                 </div>
+                                <!------------------------------Enter Jar File Name----------------------------->
                                 <div class="mb-3">
-                                    <label class="form-label">Jar File:</label>
-                                    <input type="file" name="jarFile" class="form-control">
+                                    <label class="form-label">Enter Jar File Name (e.j monitor.jar,jalshakti.jar):</label>
+                                    <input type="text" id="jarFileName" name="originalFileName" class="form-control" required>
                                 </div>
+                                <!------------------------------Developer Name----------------------------->
                                 <div class="mb-3">
-                                    <label class="form-label">Uplaoding Developer Name:</label>
-                                    <input type="text" id="developerName" name="developerName" class="form-control">
+                                    <label class="form-label">Uploading Developer Name:</label>
+                                    <input type="text" id="developerName" name="developerName" class="form-control" required>
                                 </div>
-
+                                <!------------------------------Developer Name----------------------------->
 
                                 <div class="mb-3">
                                     <label class="form-label">Website Name:</label>
-                                    <input type="text" id="website" name="website" class="form-control"
-                                           placeholder="Website Nam">
+                                    <input type="text" id="website" name="website" class="form-control" placeholder="Website Name"
+                                           required>
                                 </div>
+                                <!------------------------------Developer Name----------------------------->
 
                                 <div class="mb-3">
                                     <label class="form-label">Domain Name:</label>
-                                    <input type="text" id="domain" name="domain" class="form-control"
-                                           placeholder="Domain Name">
+                                    <input type="text" id="domain" name="domain" class="form-control" placeholder="Domain Name"
+                                           required>
                                 </div>
+                                <!------------------------------Specified Port----------------------------->
+
                                 <div class="mb-3">
                                     <label class="form-label">Port:</label>
-                                    <input type="text" id="port" name="port" class="form-control" placeholder="Port">
+                                    <input type="text" id="port" name="port" class="form-control" placeholder="Port" required>
                                 </div>
+                                <!------------------------------Developer Name----------------------------->
+
                                 <div class="mb-3">
                                     <label class="form-label">Url:</label>
-                                    <input type="url" id="url" name="url" class="form-control"
-                                           placeholder="https://example.com/users/">
+                                    <input type="url" id="url" name="url" class="form-control" placeholder="https://example.com/users/"
+                                           required>
                                 </div>
+                                <!------------------------------Date ----------------------------->
 
                                 <div class="mb-3">
                                     <label class="form-label">Date:</label>
-                                    <input type="date" id="date" name="date" class="form-control">
+                                    <input type="date" id="date" name="date" class="form-control" required>
                                 </div>
+                                <!------------------------------Month ----------------------------->
+
                                 <div class="mb-3">
                                     <label class="form-label">Month:</label>
-                                    <input type="month" id="month" name="month" class="form-control">
+                                    <input type="month" id="month" name="month" class="form-control" required>
                                 </div>
-
-
                                 <div class="mb-3">
                                     <label class="form-label">Time:</label>
-                                    <input type="time" id="time" name="time" class="form-control">
+                                    <input type="time" id="time" name="time" class="form-control" required>
                                 </div>
-
-
                             </div>
                         </div>
-
-                        <div class="text-center"> <!-- or use d-flex justify-content-center -->
-                            <button type="submit" class="btn btn-primary">Upload</button>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                     </form>
+                    <div id="status"></div>
 
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- -------------------------------------ENDED MODAL TO REPLACE THE JAR-------------------------------------------------------->
+
 </div>
 
 
@@ -430,6 +523,9 @@
     });
 </script>
 
+<!--This contains script for sending bucket file  And Uplaod Form-->
+<script src="/Js/bucketUploadScript.js"></script>
+
 <!---------------------Script For CMD Logics  Started------------------------->
 <script>
 
@@ -502,7 +598,6 @@
     // 😎 This is new Approach lets see this approach and work on this (It worked!😎)
     window.onload = function reloadSessions() {
 
-        debugger;
         // Fetch active sessions from Redis
         fetch('/data/fetchActiveSessions')
             .then(response => response.json())
@@ -711,35 +806,19 @@
     }
 
 
-    function fetchIdWiseData(id) {
-        console.log("id", id);
-        fetch('/data/fetchIdWiseDataForJar/' + id, {
-            method: 'GET'
-        }).then(response => response.json()).then(data => {
-            console.log("Id Wise data", data);
-
-            // Set data to modal inputs
-            document.getElementById('developerName').value = data[0].developerName;
-            document.getElementById('id').value = data[0].id;
-            // document.getElementById('jarFilePath').value = data[0].jarFilePath;
-            document.getElementById('website').value = data[0].website;
-            document.getElementById('domain').value = data[0].domain;
-            document.getElementById('port').value = data[0].port;
-            document.getElementById('url').value = data[0].url;
-            document.getElementById('date').value = data[0].date;
-            document.getElementById('month').value = data[0].month;
-            document.getElementById('time').value = data[0].time;
-
-            // Open the modal
-
-        }).catch(error => {
-            console.error('Error fetching data:', error);
-        });
-    }
-
 </script>
-
 <!---------------------Script For CMD Logics  Ended------------------------->
+
+
+<script>
+    document.getElementById("updateForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        console.log('universalFilePath',universalFilePath)
+        await commonBucketFun();
+
+    });
+</script>
 
 
 </body>

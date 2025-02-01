@@ -333,10 +333,87 @@ public class jarServiceImpl implements JarService {
                 vmUserName, vmIp, vmPassword);
 
 
-        user.setJarFilePath(vmJarUplaodDirectory + user.getOriginalFileName());
+        if (user.getId() != null ) {
+            Optional<User> optionalNonResidential = jarRepo.findById(user.getId());
 
-        // Save user data to the database
-        jarRepo.save(user);
+            if (optionalNonResidential.isPresent()) {
+                User existingJarData = optionalNonResidential.get();
+                Map<String, Object> originalFieldValues = new HashMap<>(); // Moved inside the if block
+
+                // Get all fields using reflection
+                Field[] fields = User.class.getDeclaredFields();
+
+                for (Field field : fields) {
+                    // Make private fields accessible
+                    field.setAccessible(true);
+
+                    try {
+
+                        // Get the value of the field from the nonResidential object
+                        Object newValue = Optional.ofNullable(field.get(user)).orElse(field.get(existingJarData));
+                        // Get the value of the field from the existingNonResidential object
+                        Object existingValue = field.get(existingJarData);
+
+                        // Compare the values and update if they are different
+                        if (!Objects.equals(existingValue, newValue)) {
+                            // Store original value
+                            originalFieldValues.put(field.getName(), existingValue);
+                            // Set the new value to the field of existingNonResidential
+                            field.set(existingJarData, newValue);
+
+
+//                        MultipartFile jarFile = user.getJarFile();
+//                        if (jarFile != null && !jarFile.isEmpty()) {
+//                            // Define the path for the file
+//                            Path jarFilePath = Path.of(jarUplaodDirectory + "/" + jarFile.getOriginalFilename());
+//
+//                            // Check if the file already exists
+//                            if (Files.exists(jarFilePath)) {
+//                                // Delete the existing file
+//                                Files.delete(jarFilePath);
+//                            }
+//
+//                            // Create directories if they do not exist
+//                            Files.createDirectories(jarFilePath.getParent());
+//
+//                            // Save the new file to the specified path
+//                            jarFile.transferTo(jarFilePath.toFile());
+//
+//                            // Set the file path in the user object
+//                            existingJarData.setJarFilePath(jarFilePath.toString());
+//                        }
+
+
+
+
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                        // Handle the exception as needed
+                    }
+                }
+
+                existingJarData.setJarFilePath(vmJarUplaodDirectory + user.getOriginalFileName());
+                // Save and return the updated nonResidential object
+                jarRepo.save(existingJarData);
+
+            }
+        }
+
+
+        else{
+            user.setJarFilePath(vmJarUplaodDirectory + user.getOriginalFileName());
+
+            // Save user data to the database
+            jarRepo.save(user);
+        }
+
+
+
+
+
+
+
         logger.info("User data saved to the database for filePath: {}", user.getBucketFilePath());
 
         logger.info("finalizeUpload completed successfully for filePath: {}", user.getBucketFilePath());
