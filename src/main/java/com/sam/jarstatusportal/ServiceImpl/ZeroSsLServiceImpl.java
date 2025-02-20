@@ -249,9 +249,14 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
                 logger.info("CNAME Target Record: {}", targetRecord);
 
                 // Remove the ".gccloudinfo.com" suffix from targetHost
-                if (targetHost.endsWith(".gccloudinfo.com")) {
-                    targetHost = targetHost.substring(0, targetHost.indexOf(".gccloudinfo.com"));
-                    logger.info("CNAME Target Host: {}", targetHost);
+//                if (targetHost.endsWith(".gccloudinfo.com")) {
+//                    targetHost = targetHost.substring(0, targetHost.indexOf(".gccloudinfo.com"));
+//                    logger.info("CNAME Target Host: {}", targetHost);
+//                }
+                // Clean the targetHost by removing everything after the first dot
+                if (targetHost.contains(".")) {
+                    targetHost = targetHost.substring(0, targetHost.indexOf("."));
+                    logger.info("new updated CNAME Target Host: {}", targetHost);
                 }
 
                 // Step 1: Add the CNAME record to GoDaddy using API

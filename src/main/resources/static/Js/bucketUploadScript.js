@@ -58,7 +58,7 @@ document.getElementById('uploadButton').addEventListener('click', async () => {
 async function commonBucketFun() {
     const statusDiv = document.getElementById("status");
     statusDiv.textContent = "Processing...";
-debugger;
+
 
     try {
 

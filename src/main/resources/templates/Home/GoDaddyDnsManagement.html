@@ -397,7 +397,7 @@
     };
     // Function to Generate CSR Certificate started ----------------
     const generateCSR = async (domain) => {
-        debugger;
+
         try {
             const response = await fetch(`/data/createSslCertificate?domain=${encodeURIComponent(domain)}`, {
                 method: 'POST'
@@ -420,7 +420,7 @@
 
     // Function to verify Domain By ZeroSsl started ----------------
     const verifyDomainByZeroSsl = async (domain) => {
-        debugger;
+
         try {
             const response = await fetch(`/data/verifyDomainByZeroSsl?domain=${encodeURIComponent(domain)}`, {
                 method: 'POST'
@@ -444,7 +444,7 @@
 
     // Function to Downlaod Zero Ssl Certificate started ----------------
     const downlaodZeroSslCertificate = async (domain) => {
-        debugger;
+
         try {
             const response = await fetch(`/data/downlaodZeroSslCertificate?domain=${encodeURIComponent(domain)}`, {
                 method: 'POST'

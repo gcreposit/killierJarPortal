@@ -536,7 +536,7 @@
     // Function to Perform Action on Play Button Click sab kch yhni se shuur horha h
     function performAction(path, id) {
         console.log("JAR Path:", path, "Row Data:", id);
-        debugger;
+
         // Generate IDs
         const sessionId = `cmd-${id}`;
         const tabId = `tab-${tabCounter}`;
@@ -631,7 +631,7 @@
     };
 
     function justToReconnectWebsocket(sessionId, consoleId) {
-        debugger;
+
         const consoleDiv = document.getElementById(consoleId);
         // const socket = new WebSocket(`ws://localhost:5050/ws/logs?sessionId=${sessionId}`);
         const socket = new WebSocket(`wss://jar-status-portal-1046319252567.asia-south2.run.app/ws/logs?sessionId=${sessionId}`);
@@ -680,7 +680,7 @@
 
     // Function to Setup WebSocket
     function setupWebSocket(path, id, sessionId, consoleId) {
-        debugger;
+         ;
         console.log("redis SessionId", sessionId)
         console.log("redis consoleId", consoleId)
         const consoleDiv = document.getElementById(consoleId);
