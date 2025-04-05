@@ -115,16 +115,16 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
 
         try {
             logger.info("Generating CSR using OpenSSL...");
-//            ProcessBuilder processBuilder = new ProcessBuilder("C:\\Program Files\\OpenSSL-Win64\\bin\\openssl", "req", "-nodes", "-newkey", "rsa:2048", "-sha256", "-keyout", tempKeyFilePath.toString(), "-out", tempCSRFilePath.toString(), "-subj", "/CN=" + domain, "-config", "C:\\Program Files\\OpenSSL-Win64\\bin\\cnf\\openssl.cnf");
+            ProcessBuilder processBuilder = new ProcessBuilder("C:\\Program Files\\OpenSSL-Win64\\bin\\openssl", "req", "-nodes", "-newkey", "rsa:2048", "-sha256", "-keyout", tempKeyFilePath.toString(), "-out", tempCSRFilePath.toString(), "-subj", "/CN=" + domain, "-config", "C:\\Program Files\\OpenSSL-Win64\\bin\\cnf\\openssl.cnf");
 
 //          New Process Build (Its is for Docker so if you want to test it on local comment out above process builder and make sure you have open ssl isntalled in your pc
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                    "/usr/bin/openssl",
-                    "req", "-nodes", "-newkey", "rsa:2048", "-sha256",
-                    "-keyout", tempKeyFilePath.toString(),
-                    "-out", tempCSRFilePath.toString(),
-                    "-subj", "/CN=" + domain
-            );
+//            ProcessBuilder processBuilder = new ProcessBuilder(
+//                    "/usr/bin/openssl",
+//                    "req", "-nodes", "-newkey", "rsa:2048", "-sha256",
+//                    "-keyout", tempKeyFilePath.toString(),
+//                    "-out", tempCSRFilePath.toString(),
+//                    "-subj", "/CN=" + domain
+//            );
 
 
 
@@ -273,6 +273,7 @@ public class ZeroSsLServiceImpl implements ZeroSsLService {
     // -----------------------------   This method is used to Add DNS Record  In Go Daddy Domain-----------------------------------------------------------
     private void addDnsRecordToGoDaddy(String domain, String type, String name, String data) {
         logger.info("Adding DNS record to GoDaddy for domain: {}", domain);
+        logger.info("Adding updated Host Record Name  is : {}", name);
 
         String url = "https://api.godaddy.com/v1/domains/" + domain + "/records/" + type + "/" + name;
 
